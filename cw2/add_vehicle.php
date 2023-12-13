@@ -52,22 +52,10 @@ if (isset($_SESSION['username'])) {
     <div class="form-group">
         <label for="Owner">Owner <span style="color: red;">*</span></label>
 
-        <!-- <div autocomplete="off" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>"> -->
         <div class="autocomplete">
-            <input id="myInput" type="text" name="ownerName" placeholder="owner" style="display:inline;width:70%">
-            <button type="button" onclick="openNewOwnerForm()" style="padding:2px;margin:0rem 1rem;">New Owner</button>
+            <input id="myInput" type="text" name="ownerName" placeholder="person" style="display:inline;width:70%">
+            <button type="button" onclick="openNewOwnerForm()" style="padding:2px;margin:0rem 1rem;">New Person</button>
         </div>
-        <!-- <input type="submit" style="padding:2px"> -->
-        <!-- </div> -->
-
-
-        <!-- <div class="textwithbutton">
-            <input type="text" id="owner" name="owner" onkeyup="showMatches(this.value)" class="form-control">
-            <button type="button" onclick="openNewOwnerForm()" style="padding:2px;margin:0rem 2rem;">New Owner</button>
-            <div id="ownerMatches" class="autocomplete"></div>
-        </div> -->
-
-        <!-- <button type="button" onclick="openNewOwnerForm()" style="padding:0">New Owner</button> -->
 
         <!-- <dialog id="newOwnerModal" class="modal">
             <div class="modal-content">

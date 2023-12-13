@@ -158,33 +158,34 @@ function searchMenu() {
 }
 
 function searchText(filter, content) {
-
-    for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        currentText = a.innerHTML.toUpperCase();
+    var allIndexes = [];
+    for (i = 0; i < content.length; i++) {
         found = true;
+        var charIndexes = [];
 
         // check if all characters in filter are found in currentText
         for (j = 0; j < filter.length; j++) {
             if (filter[j] === " ") continue; // skip spaces
 
-            var charIndex = currentText.indexOf(filter[j]);
+            var charIndex = content.indexOf(filter[j]);
             if (charIndex === -1) {
                 found = false;
                 break;
             } else {
                 // only remove the first occurrence of the character
-                currentText = currentText.substring(0, charIndex) + currentText.substring(charIndex + 1);
+                // content = content.substring(0, charIndex) + content.substring(charIndex + 1);
+                charIndexes.push(charIndex);
             }
         }
 
-        // if all characters in filter are found in currentText, show the li item
+        // if all characters in filter are found in currentText
         if (found) {
-            li[i].style.display = "";
+            allIndexes.push(charIndexes);
         } else {
-            li[i].style.display = "none";
+            allIndexes.push([]);
         }
     }
+    return allIndexes;
 }
 
 
@@ -226,7 +227,17 @@ function closeNewOwnerForm() {
 
 
 
-
+function boldMatchingCharacters(str, val) {
+    var result = str;
+    for (var i = 0; i < val.length; i++) {
+        if (val[i] === " ") continue;
+        var re = new RegExp(val[i], "gi");
+        result = result.replace(re, function (match) {
+            return "<strong>" + match + "</strong>";
+        });
+    }
+    return result;
+}
 
 
 function autocomplete(inpElement) {
@@ -253,7 +264,7 @@ function autocomplete(inpElement) {
         xhr.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
                 var people;
-                var val = inpElement.value.toUpperCase();
+                var val = inpElement.value.toUpperCase().replace(/\s+/g, ""); // skip spaces
 
                 // found at least a match
                 if (!this.responseText.includes("<p>")) {
@@ -269,18 +280,35 @@ function autocomplete(inpElement) {
                 }
 
                 for (i = 0; i < people.length; i++) {
+                    var personInfo = (people[i].People_name + " " + people[i].People_licence).toUpperCase();
                     
-                    // check if the item starts with the same letters as the text field value
-                    if (people[i].People_name.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    var found = true;
+
+                    // check if all characters in filter are found in currentText
+                    for (var j = 0; j < val.length; j++) {
+                        var pos = personInfo.indexOf(val[j]);
+
+                        if (personInfo.indexOf(val[j]) === -1) {
+                            found = false;
+                            break;
+                        }
+                        else {
+                            // only remove the first occurrence of the character
+                            personInfo = personInfo.substring(0, pos) + personInfo.substring(pos + 1);
+                        }
+                    }
+
+                    if (found) {
 
                         // create a DIV element for each matching element
                         b = document.createElement("DIV");
+
                         // make the matching letters bold
-                        b.innerHTML = "<strong>" + people[i].People_name.substr(0, val.length) + "</strong>";
-                        b.innerHTML += people[i].People_name.substr(val.length) + " - " + people[i].People_licence;
+                        var personInfoCopy = (people[i].People_name + " " + people[i].People_licence).toUpperCase();
+                        b.innerHTML = boldMatchingCharacters(personInfoCopy, val);
 
                         // insert a input field that will hold the current array item's value
-                        b.innerHTML += "<input type='hidden' value='" + people[i].People_name + people[i].People_licence + "'>";
+                        b.innerHTML += "<input type='hidden' value='" + people[i].People_name +" "+ people[i].People_licence + "'>";
 
                         // execute a function when someone clicks on the item value (DIV element)
                         b.addEventListener("click", function (e) {
@@ -292,11 +320,10 @@ function autocomplete(inpElement) {
                         a.appendChild(b);
                     }
                 }
-
             }
         };
         // xhr.open("GET", "inc/get_people.php?q=" + inpElement.value, true);
-        xhr.open("GET", "inc/get_people.php?q=" + encodeURIComponent(inpElement.value), true);
+        xhr.open("GET", "inc/get_people.php?q=" + encodeURIComponent(inpElement.value.replace(/\s+/g, "")), true);
         document.getElementById("myInput")
         xhr.send();
     });
