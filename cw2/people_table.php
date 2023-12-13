@@ -13,7 +13,7 @@ if (!empty($info)) {
 
         // generate table header
         echo "
-        <table class='table table-striped'>
+        <table class='table table-striped' id='peopleTable'>
         <thead>
         <tr>
             <th>People_ID</th>

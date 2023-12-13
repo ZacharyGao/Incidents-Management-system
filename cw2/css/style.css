@@ -624,9 +624,24 @@ form {
     text-align: var(--justify-normal);
 }
 
+form .form-group {
+    /* margin: 1rem 0rem; */
+    /* padding: 1rem 0; */
+    /* width: 100%; */
+    max-width: calc(100% - 1.6rem);
+}
+
 form header {
     margin: 1.5rem 0rem;
     padding: 1.5rem 0;
+}
+
+form button{
+    display: inline;
+    margin: 0rem 1rem 0rem 0rem;
+    padding: 1rem 0;
+    width: 10rem;
+    /* height: 6rem; */
 }
 
 form .form-group .autocomplete input[type="text"] {
@@ -870,7 +885,8 @@ blockquote footer {
 /* Scrollbars */
 * {
     scrollbar-width: thin;
-    scrollbar-color: rgb(202, 202, 232) auto;
+    /* scrollbar-color: rgb(202, 202, 232) auto; */
+    scrollbar-color: var(--color-bg-secondary) auto;
 }
 
 *::-webkit-scrollbar {
