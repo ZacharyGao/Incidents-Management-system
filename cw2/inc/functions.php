@@ -139,7 +139,7 @@ function queryPeople($db, $name)
 
 function addPerson($db, $name, $licence, $address = null, $personDOB = null, $personPoints = null)
 {
-    queryPeople($db, $licence);
+    $people = queryPeople($db, $licence);
     if (!empty($people)) {
         echo "People already exists in database. People licence is: " . $licence . "<br>";
         return false;
@@ -153,56 +153,95 @@ function addPerson($db, $name, $licence, $address = null, $personDOB = null, $pe
     $stmt->execute();
     $result = $stmt->get_result();
 
-    echo "New person added successfully. Person licence is: " . $licence . "<br>";
+    // echo "New person added successfully. Person licence is: " . $licence . "<br>";
     return $result;
 }
 
 function findPersonIDByLicence($db, $licence)
 {
-    $stmt = $db->prepare("SELECT * FROM People WHERE People_licence LIKE ?");
-    $licence = "%$licence%";
-    $stmt->bind_param("s", $licence);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $people = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    return $people[0]["People_ID"];
+    $people = queryPeople($db, $licence);
+
+    if (empty($people)) {
+        return null;
+    } elseif (count($people) == 1) {
+        return $people[0]['People_ID'];
+    } else {
+        // echo "More than one people found. Please check.<br>";
+        return $people[0]['People_ID'];
+    }
+
+
+    // foreach ($people as $person) {
+    //     if ($person['People_licence'] == $licence) {
+    //         return $person['People_ID']; // ID
+    //     }
+    // }
+    // return null; // not found
 }
 
 function findVehicleIDByLicence($db, $licence)
 {
-    $stmt = $db->prepare("SELECT * FROM Vehicle WHERE Vehicle_licence LIKE ?");
-    $newlicence = "%$licence%";
-    $stmt->bind_param("s", $newlicence);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $vehicle = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    if (empty($vehicle)) {
-        echo "Vehicle not found. Please add this vehicle first. Vehicle licence is: " . $licence . "<br>";
-        return false;
+    $vehicles = queryVehicle($db, $licence);
+
+    if (empty($vehicles)) {
+        return null;
+    } elseif (count($vehicles) == 1) {
+        return $vehicles[0]['Vehicle_ID'];
+    } else {
+        echo "Invalid vehicle plate number. Please check.<br>";
+        // return $vehicles[0]['Vehicle_ID'];
+        return null;
     }
-    return $vehicle[0]["Vehicle_ID"];
+
+    // foreach ($vehicles as $vehicle) {
+    //     if ($vehicle['Vehicle_licence'] == $licence) {
+    //         return $vehicle['Vehicle_ID']; // ID
+    //     }
+    // }
+    // return null; 
 }
 
 function findOffenceIDByDescription($db, $description)
 {
-    $stmt = $db->prepare("SELECT * FROM Offence WHERE Offence_description LIKE ?");
-    $description = "%$description%";
-    $stmt->bind_param("s", $description);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $offence = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    return $offence[0]["Offence_ID"];
+    $offences = queryOffences($db, $description);
+
+    if (empty($offences)) {
+        return null;
+    } elseif (count($offences) == 1) {
+        return $offences[0]['Offence_ID'];
+    } else {
+        // echo "More than one offence found. Please check.<br>";
+        return $offences[0]['Offence_ID'];
+    }
+
+
+    // foreach ($offences as $offence) {
+    //     if ($offence['Offence_description'] == $description) {
+    //         return $offence['Offence_ID']; // ID
+    //     }
+    // }
+    // return null; 
 }
 
 function findIncidentIDByReport($db, $report)
 {
-    $stmt = $db->prepare("SELECT * FROM Incident WHERE Report_ID LIKE ?");
-    $report = "%$report%";
-    $stmt->bind_param("s", $report);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $incident = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    return $incident[0]["Incident_ID"];
+    $incidents = queryIncident($db, $report);
+
+    if (empty($incidents)) {
+        return null;
+    } elseif (count($incidents) == 1) {
+        return $incidents[0]['Incident_ID'];
+    } else {
+        // echo "More than one incident found. Please check.<br>";
+        return $incidents[0]['Incident_ID'];
+    }
+
+    // foreach ($incidents as $incident) {
+    //     if ($incident['Vehicle_licence'] == $report) {
+    //         return $incident['Vehicle_ID']; // ID
+    //     }
+    // }
+    // return null; 
 }
 
 function queryVehicle($db, $info)
@@ -251,6 +290,16 @@ function queryOffences($db, $info)
     return $offences;
 }
 
+function checkOwnership($db, $vehicleID, $peopleID)
+{
+    $stmt = $db->prepare("SELECT * FROM Ownership WHERE Vehicle_ID = ? AND People_ID = ?");
+    $stmt->bind_param("ss", $vehicleID, $peopleID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $ownership = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    return $ownership;
+}
 
 
 function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleLicence)
@@ -272,7 +321,6 @@ function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleL
         if (empty($searchedPeople)) {
             // echo "Person not found. Please add this person: " . $peopleLicence . " first.<br>";
             return false;
-
         } elseif (count($searchedPeople) > 1) {
             // echo "More than one people found. Please check.<br>";
             // printTable($searchedPeople);
@@ -285,7 +333,7 @@ function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleL
 
             $searchedVehicle = queryVehicle($db, $vehicleLicence);
             if (empty($searchedVehicle)) {
-                
+
                 // echo "This is a new vehicle. Adding vehicle.<br>";
 
                 // add vehicle to database
@@ -295,25 +343,30 @@ function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleL
                 echo "New vehicle added successfully. Vehicle licence is: " . $vehicleLicence . "<br>";
                 $vehicleID = findVehicleIDByLicence($db, $vehicleLicence);
 
-                // add ownership to database
+                // new vehicle added, add ownership to database
                 $stmt = $db->prepare("INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES (?, ?)");
                 $stmt->bind_param("ss", $peopleID, $vehicleID);
                 $stmt->execute();
                 echo "New ownership added successfully. Vehicle licence is: " . $vehicleLicence . " and owner is: " . $peopleLicence . "<br>";
 
                 $db->commit();
-            }
-            else{
+            } else {
                 echo "This vehicle is an existed vehicle. Vehicle licence is: " . $vehicleLicence . "<br>";
                 $vehicleID = findVehicleIDByLicence($db, $vehicleLicence);
 
                 // add ownership to database
-                $stmt = $db->prepare("INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES (?, ?)");
-                $stmt->bind_param("ss", $peopleID, $vehicleID);
-                $stmt->execute();
-                echo "New ownership added successfully. Vehicle licence is: " . $vehicleLicence . " and owner is: " . $peopleLicence . "<br>";
+                $checkedOwnership = checkOwnership($db, $vehicleID, $peopleID);
+                if (!empty($checkedOwnership)) {
+                    echo "Ownership already exists and didn't change. Vehicle licence is: " . $vehicleLicence . " and owner is: " . $peopleLicence . "<br>";
+                    return false;
+                } else {
+                    $stmt = $db->prepare("INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES (?, ?)");
+                    $stmt->bind_param("ss", $peopleID, $vehicleID);
+                    $stmt->execute();
+                    echo "New ownership added successfully. Vehicle licence is: " . $vehicleLicence . " and owner is: " . $peopleLicence . "<br>";
 
-                $db->commit();
+                    $db->commit();
+                }
             }
         }
 
@@ -322,6 +375,44 @@ function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleL
     } catch (mysqli_sql_exception $exception) {
         $db->rollback();
         throw $exception;
+    }
+}
+
+function addIncident($db, $vehicleID, $peopleID, $incidentDate, $incidentReport, $offenceID)
+{
+
+    $db->begin_transaction();
+
+    try {
+        $db->autocommit(FALSE); //turn on transactions
+
+        // check if incident exists
+        $sql = "SELECT * FROM Incident WHERE Vehicle_ID = " . $vehicleID . " and People_ID = " . $peopleID . " and Incident_Date = '" . $incidentDate . "' and Incident_Report = '" . $incidentReport . "' and Offence_ID = " . $offenceID;
+        $result = mysqli_query($db, $sql);
+        $searchedIncident = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+        if (!empty($searchedIncident)) {
+            // echo "Incident already exists. Incident report is: " . $incidentReport . "<br>";
+            return false;
+        }
+
+        // add incident to database
+        $stmt = $db->prepare("INSERT INTO Incident (Vehicle_ID, People_ID, Incident_Date, Incident_Report, Offence_ID) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $vehicleID, $peopleID, $incidentDate, $incidentReport, $offenceID);
+        $excResult = $stmt->execute();
+        if ($excResult) {
+            echo "New incident added successfully. Incident report is: " . $incidentReport . "<br>";
+
+            $db->commit();
+        } else {
+            echo "Failed to add incident. Incident report is: " . $incidentReport . "<br>";
+            return false;
+        }
+    } catch (mysqli_sql_exception $exception) {
+        $db->rollback();
+        throw $exception;
+    } finally {
+        $db->autocommit(TRUE); // turn off transactions + commit queued queries
     }
 }
 
@@ -381,9 +472,24 @@ function findTitle($string)
     $title = substr($string, 5, strpos($string, ".") - 5);
     if (strpos($title, "_")) {
         $title = str_replace("_", " ", $title);
-        // 大写首字母
+        // capitalize first letter of each word
     }
     $title = ucwords($title);
 
     return $title;
+}
+
+
+function associateFineToReport($db, $fineAmount, $finePoints, $incidentID)
+{
+    // sql to insert fine
+    $stmt = $db->prepare("INSERT INTO Fines (Fine_amount, Fine_points, Incident_ID) VALUES (?, ?, ?)");
+    $stmt->bind_param("ssi", $fineAmount, $finePoints, $incidentID);
+    $stmt->execute();
+
+    if ($stmt->affected_rows > 0) {
+        echo "Fine associated to report successfully.";
+    } else {
+        echo "Error associating fine to report.";
+    }
 }

@@ -18,8 +18,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["username"]) && isset($
     }
 }
 require_once "inc/header.php";
-// echo $connectDBMessage;
-// echo DB_SERVER;
 ?>
 
 

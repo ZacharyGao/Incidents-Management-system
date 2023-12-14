@@ -1,38 +1,14 @@
 <?php
-
-// // configuration
-// require("inc/config.php"); 
-
-// // log out current user, if any
-// logout();
-
-// // redirect user
-// redirect("/");
-
-// // unset any session variables
-// $_SESSION = [];
-
-// // expire cookie
-// if (!empty($_COOKIE[session_name()])) {
-//     setcookie(session_name(), "", time() - 42000);
-// }
-
-// // destroy session
-// session_unset();
-
-// // header("inedx.php");
-// redirect("/");
+// logout.php
+session_start(); 
 
 
-session_start(); // 开始会话
-
-// 注销所有会话变量
 session_unset();
 
-// 销毁会话
+// destroy the session 
 session_destroy();
 
-// 重定向到首页
+// redirect to home page
 header("Location: index.php");
 exit;
 ?>

@@ -25,6 +25,7 @@
 
     <!-- <link rel="stylesheet" href="../css/mvp.css"> -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/x-icon" href="/car.ico">
 
     <!-- <script src="js/script.js"></script> -->
 
@@ -37,9 +38,10 @@
         <div class="closebtn" onclick="closeNav()"><a href="javascript:void(0)">×</a></div>
         <div class="search" onkeyup="searchMenu()"><input type="text" id="mySearch" placeholder="Search" title="Type in a category"></div>
         <ul id="myMenu">
-            <li><a href="index.php">CW2</a></li>
+            <li><a href="index.php">Home</a></li>
             <li><a href="dashboard.php">Dashboard</a></li>
-            <li><a href="search_people.php"><i class="fa fa-fw fa-user"></i> People</a></li>
+            <!-- <li><a href="search_people.php"><i class="fa fa-fw fa-user"></i> People</a></li> -->
+            <li><a href="search_people.php">People</a></li>
 
             <!-- <div class="dropdown">
                 <button class="dropbtn">Dropdown
@@ -55,7 +57,8 @@
             <li><a href="search_vehicle.php">Vehicle</a></li>
             <li><a href="add_vehicle.php">AddVehicle</a></li>
             <li><a href="report.php">Report</a></li>
-<!-- 
+
+            <!-- 
             <div class="dropdown">
                 <li><a class="dropbtn">Dropdown
                         <i class="fa fa-caret-down"></i>

@@ -1,6 +1,12 @@
 <?php include_once("inc/config.php"); ?>
 <?php include_once("inc/header.php"); ?>
 
+<h2>Incidents Management system (IMS)</h2>
+
+<p>
+    The IMS is a web-based system that allows police officers to manage incidents, vehicles, and people. The system is to be used by police officers to record incidents, and to add and search for people and vehicles. The system is also to be used by police administrators to add new police officers and to associate fines to incidents. The system also provides an audit trail of database accesses and changes.
+</p>
+<br>
 
 <h2>Core features</h2>
 
@@ -9,7 +15,7 @@
 
 <p>A police officer should be able to log into the system using one of the following usernames/password combinations:</p>
 
-<table>
+<table class="table table-striped">
     <tr>
         <th>username</th>
         <th>password</th>

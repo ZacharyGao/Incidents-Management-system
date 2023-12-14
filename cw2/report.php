@@ -3,49 +3,64 @@ require_once "inc/config.php";
 require_once "inc/functions.php";
 require_once "inc/header.php";
 
-$success = $infoError = "";
 
-// add new report
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['person'], $_POST['date'], $_POST['time'], $_POST['personLicence'], $_POST['regNum'], $_POST['statement'], $_POST['offence'])) {
-    $person = clean_input($_POST['person']);
-    $personID = findPersonIDByLicence($db, $person);
-
-    $date = clean_input($_POST['date']);
-    $time = clean_input($_POST['time']);
-    $personLicence = clean_input($_POST['personLicence']);
-    $regNum = clean_input($_POST['regNum']);
-    $vehicleID = findVehicleIDByLicence($db, $regNum);
-
-    $statement = clean_input($_POST['statement']);
-    $offenceID = clean_input($_POST['offence']);
+if (isset($_SESSION['username'])) {
 
 
-    $stmt = $db->prepare("SELECT * FROM Incident WHERE Vehicle_ID = ? AND People_ID = ? AND Incident_Date = ? AND Incident_Report = ? AND Offence_ID = ?");
-    $stmt->bind_param("sssss", $vehicleID, $personID, $date, $statement, $offenceID);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $report = $result->fetch_assoc();
+    $infoForAddReport = $infoError = "";
 
-    if ($result->num_rows == 0) {
+    if (isset($_SESSION['addedPersonName'])) {
 
-        $insert_stmt = $db->prepare("INSERT INTO Incident (Vehicle_ID, People_ID, Incident_Date, Incident_Report, Offence_ID) VALUES (?, ?, ?, ?, ?)");
-        $insert_stmt->bind_param("sssss", $vehicleID, $personID, $date, $statement, $offenceID);
-        $insert_stmt->execute();
-        $success = "Report successfully added.";
-        echo $success;
+        $addNewPersonInfo = "<p>New person <strong>" . $_SESSION['addedPersonName'] . "</strong> added successfully to database.</p>";
     } else {
-        $infoError = "Report already exists.";
-        echo $infoError;
+        $addNewPersonInfo = "";
     }
+
+    // add new report
+    if (
+        $_SERVER["REQUEST_METHOD"] == "POST"
+        && isset($_POST['person']) && isset($_POST['date']) && isset($_POST['time']) && isset($_POST['regNum']) && isset($_POST['statement']) && isset($_POST['offence'])
+    ) {
+
+        $person = clean_input($_POST['person']);
+        $personID = findPersonIDByLicence($db, $person);
+        if (empty($personID)) {
+            $infoForAddReport = "Please add this person first.<br>";
+            echo $infoForAddReport;
+        } else {
+
+            $regNum = clean_input($_POST['regNum']);
+            $vehicleID = findVehicleIDByLicence($db, $regNum);
+
+            if (empty($vehicleID)) {
+                $infoForAddReport =  "Please add this vehicle first. <a href='add_vehicle.php'>Add Vehicle</a><br>";
+                echo $infoForAddReport;
+            } else {
+                $date = clean_input($_POST['date']);
+                $time = clean_input($_POST['time']);
+                $statement = clean_input($_POST['statement']);
+                $offenceID = clean_input($_POST['offence']);
+
+                if (empty($date) || empty($time) || empty($statement) || empty($offenceID)) {
+                    $infoForAddReport = "Please fill in all fields.";
+                } else {
+                    addIncident($db, $vehicleID, $personID, $date, $statement, $offenceID);
+                    $infoForAddReport = "Report successfully added.";
+                }
+            }
+        }
+    } else {
+        $infoForAddReport = "Please fill in all fields.";
+    }
+
+    // search report
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['report'])) {
+        $report = clean_input($_POST['report']);
+        $incident = queryIncident($db, $report);
+    }
+} else {
+    pleaseLogin();
 }
-
-
-// search report
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['report'])) {
-    $report = clean_input($_POST['report']);
-    $incident = queryIncident($db, $report);
-}
-
 ?>
 
 <h2>Add New Report</h2>
@@ -53,28 +68,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['report'])) {
 <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" name="add_vehicle">
     <div class="form-group">
 
-
         <label for="ownerAutocomplete">Person <span style="color: red;">*</span></label>
         <div class="autocomplete">
             <input id="ownerAutocomplete" type="text" name="person" placeholder="Person" style="display:inline;width:70%">
             <button type="button" onclick="openNewOwnerForm()" style="padding:2px;margin:0rem 1rem;">Add New Person</button>
+            <div class="feedback-container" id="addNewPersonInfo" name="addNewPersonInfo"><?php echo $addNewPersonInfo; ?></div>
         </div>
 
         <label for="date">Date <span style="color:red;">*</span></label>
-        <input type="date" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="date" name="date">
+        <input type="date" class="form-control <?php echo $infoForAddReport ? 'is-invalid' : null; ?>" id="date" name="date">
 
         <label for="time">Time <span style="color:red;">*</span></label>
-        <input type="time" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="time" name="time">
-
-        <label for="personLicence">Person Licence <span style="color:red;">*</span></label>
-        <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="personLicence" name="personLicence">
+        <input type="time" class="form-control <?php echo $infoForAddReport ? 'is-invalid' : null; ?>" id="time" name="time">
 
         <label for="regNum">Vehicle Plate Number <span style="color:red;">*</span></label>
-        <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="regNum" name="regNum">
+        <input type="text" class="form-control <?php echo $infoForAddReport ? 'is-invalid' : null; ?>" id="regNum" name="regNum">
 
         <br>
         <label for="statement">statement <span style="color: red;">*</span></label>
-        <textarea type="textarea" class="form-control> <?php echo $infoError ? 'is-invalid' : null; ?>" id="statement" name="statement">
+        <textarea type="textarea" class="form-control> <?php echo $infoForAddReport ? 'is-invalid' : null; ?>" id="statement" name="statement">
         </textarea>
 
         <label for="offence">Offence Type</label>
@@ -89,8 +101,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['report'])) {
 
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
-    <div class="invalid-feedback"><?php echo $infoError; ?></div>
+    <div class="invalid-feedback"><?php echo $infoForAddReport; ?></div>
 </form>
+
+
+<div class="modal" id="newPerson">
+    <span onclick="document.getElementById('modalForAddPersonID').style.display='none'" class="close" title="Close Modal">&times;</span>
+
+    <form action="" method="post" class="modal-content" id="newPersonForm" name="newPersonForm">
+        <div class="container">
+
+            <h3>New Person</h3>
+
+            <label for="personName"><b>personName </b><span style="color:red;">*</span></label>
+            <input type="text" placeholder="Enter personName" id="personName">
+
+            <label for="licenceNum"><b>licenceNum </b><span style="color:red;">*</span></label>
+            <input type="text" placeholder="Enter licenceNum" id="licenceNum">
+
+            <label for="personDOB"><b>Date of Birth</b></label>
+            <input type="text" id="personDOB">
+
+            <label for="penaltyPoints"><b>penaltyPoints</b></label>
+            <input type="text" id="penaltyPoints">
+
+            <label for="address"><b>address</b></label>
+            <input type="text" id="address">
+
+            <button id="newPersonInfo" type="submit" name="submit" class="btn">Confirm</button>
+            <button id="closeNewOwnerButton" type="button" class="btn cancel" onclick="closeNewOwnerForm()">Cancel</button>
+        </div>
+
+    </form>
+</div>
+
+
+
 
 <br>
 <br>

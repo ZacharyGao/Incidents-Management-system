@@ -3,7 +3,6 @@
 require_once "config.php";
 require_once "functions.php";
 
-echo $_SERVER["REQUEST_METHOD"];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $personName = (empty($_POST['personName'])) ? NULL : $_POST['personName'];
@@ -26,6 +25,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     addPerson($db, $personName, $licenceNum, $address, $personDOB, $penaltyPoints,);
 
     // response success message
-    echo "New person added successfully to database.";
+    echo "New person <strong>".$personName."</strong> added successfully.<br> You can now add a new vehicle now.";
+
+    unset($_SESSION['addedPersonName']);
+    $_SESSION['addedPersonName'] = $personName;
     return true;
 }

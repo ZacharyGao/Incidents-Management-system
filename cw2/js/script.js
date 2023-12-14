@@ -249,7 +249,7 @@ function selectOwner(name) {
 
 function openNewOwnerForm() {
 
-    if (document.getElementById("ownerAutocomplete").value != "") {
+    if (document.getElementById("ownerAutocomplete").value != null) {
         document.getElementById("licenceNum").value = document.getElementById("ownerAutocomplete").value;
     }
     else {
@@ -488,11 +488,26 @@ function addNewPersonToDatabase() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            // console.log('Person added successfully');
-            document.getElementById('newPerson').innerHTML = this.responseText;
+            // document.getElementById('addNewPersonInfo').innerHTML = this.responseText;
+            // document.getElementById('addNewPersonInfo').value = this.responseText;
+
         }
     };
     xhttp.open("POST", "inc/add_new_person.php", true);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.send("personName=" + personName + "&licenceNum=" + licenceNum + "&personDOB=" + personDOB + "&penaltyPoints=" + penaltyPoints + "&address=" + address);
+
+
+    
+    // var formData = new FormData(this);
+    // var xhr = new XMLHttpRequest();
+    // xhr.open("POST", targetUrl, true);
+
+    xhttp.onload = function () {
+        if (this.status == 200) {
+            document.querySelector(".feedback-container").innerHTML = this.responseText;
+        }
+    };
+
+    // xhr.send(formData);
 }

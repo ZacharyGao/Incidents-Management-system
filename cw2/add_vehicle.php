@@ -7,6 +7,14 @@ $info = $infoError = "";
 
 if (isset($_SESSION['username'])) {
 
+    if (isset($_SESSION['addedPersonName'])) {
+        
+        $addNewPersonInfo = "<p>New person <strong>" . $_SESSION['addedPersonName'] . "</strong> added successfully to database.</p>";
+    
+    }else{
+        $addNewPersonInfo = "";
+    }
+
     if (
         $_SERVER["REQUEST_METHOD"] == "POST"
         && isset($_POST["type"]) && isset($_POST["colour"]) && isset($_POST["regNum"]) && isset($_POST["owner"])
@@ -14,7 +22,7 @@ if (isset($_SESSION['username'])) {
 
         if (empty($_POST["owner"])) {
             $infoError = "<p>Please enter owner info.</p>";
-            echo $infoError;
+            // echo $infoError;
         } else {
 
             $info = filter_input(INPUT_POST, "owner", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -22,23 +30,23 @@ if (isset($_SESSION['username'])) {
 
             if (empty($people)) {
                 $infoError = "<p>Owner not found. Please add this person first</p>";
-                echo $infoError;
+                // echo $infoError;
             } else if (count($people) > 1) {
-                echo "<p>Found " . count($people) . " owner results.</p>";
+                // echo "<p>Found " . count($people) . " owner results.</p>";
 
                 for ($i = 0; $i < count($people); $i++) {
-                    echo "<p>Name: " . $people[$i]["People_name"] . ".<br> License: " . $people[$i]["People_licence"] . ".</p>";
+                    // echo "<p>Name: " . $people[$i]["People_name"] . ".<br> License: " . $people[$i]["People_licence"] . ".</p>";
                 }
 
                 $infoError =  "<p>More than 1 person found. Please check.</p>";
-                echo $infoError;
+                // echo $infoError;
             } else {
-                echo "<p>Found this person. Adding vehicle.</p>";
+                // echo "<p>Found this person. Adding vehicle.</p>";
                 for ($i = 0; $i < count($people); $i++) {
-                    echo "<p>Name: " . $people[$i]["People_name"] . ".<br> License: " . $people[$i]["People_licence"] . ".</p>";
+                    // echo "<p>Name: " . $people[$i]["People_name"] . ".<br> License: " . $people[$i]["People_licence"] . ".</p>";
                 }
                 $infoError =  "<p>Owner found: " . $people[0]["People_name"] . "</p>";
-                echo $infoError;
+                // echo $infoError;
 
 
                 // add vehicle
@@ -75,6 +83,7 @@ if (isset($_SESSION['username'])) {
             <input id="ownerAutocomplete" type="text" name="owner" placeholder="person" style="display:inline;width:70%">
             <button id="newOwnerButton" type="button" onclick="openNewOwnerForm()" style="padding:2px;margin:0rem 1rem;">New Person</button>
         </div>
+        <div class="feedback-container" id="addNewPersonInfo" name="addNewPersonInfo"><?php echo $addNewPersonInfo; ?></div>
 
         <br>
         <label for="type">Vehicle type </label>
