@@ -139,6 +139,20 @@ function queryPeople($db, $name)
     return $people;
 }
 
+function addPerson($db, $name, $licence, $address=null, $personDOB=null, $personPoints=null)
+{
+    $name = clean_input($name);
+    $licence = clean_input($licence);
+
+    $stmt = $db->prepare("INSERT INTO People (People_name, People_licence) VALUES (?, ?)");
+    $stmt->bind_param("ss", $name, $licence);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    echo "New person added successfully. Person licence is: " . $licence . "<br>";
+    return $result;
+}
+
 function queryVehicle($db, $info)
 {
 
@@ -183,35 +197,22 @@ function queryIncidents($db, $info)
     return $incidents;
 }
 
-function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleID)
+function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleLicence)
 {
 
     $vehicleType = clean_input($vehicleType);
     $vehicleColour = clean_input($vehicleColour);
     $vehicleLicence = clean_input($vehicleLicence);
-    $peopleID = clean_input($peopleID); // supposing by peopleID
+    $peopleLicence = clean_input($peopleLicence); // supposing by peopleID
 
     $db->begin_transaction();
 
     try {
         $db->autocommit(FALSE); //turn on transactions
 
-        $stmt = $db->prepare("INSERT INTO Vehicle (Vehicle_type, Vehicle_colour, Vehicle_licence) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $vehicleType, $vehicleColour, $vehicleLicence);
-        $stmt->execute();
-        $vehicleID = $db->insert_id; // get the last inserted ID
-        echo "New vehicle added successfully. Vehicle ID is: " . $vehicleID . "<br>";
-
-        $stmt = $db->prepare("INSERT INTO Ownership (Vehicle_ID, People_ID) VALUES (?, ?)");
-        $stmt->bind_param("ss", $vehicleID, $peopleID);
-        $stmt->execute();
-        echo "New ownership added successfully. Vehicle ID is: " . $vehicleID . "<br>";
-
-
-
         // check if people exists
-        $stmt = $db->prepare("SELECT * FROM People WHERE People_ID = ?");
-        $stmt->bind_param("s", $peopleID);
+        $stmt = $db->prepare("SELECT * FROM People WHERE People_licence = ?");
+        $stmt->bind_param("s", $peopleLicence);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -219,24 +220,32 @@ function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleI
         if ($result->num_rows == 0) {
             // owner does not exist in database
             $stmt = $db->prepare("INSERT INTO People (People_ID) VALUES (?)");
-            $stmt->bind_param("s", $peopleID);
+            $stmt->bind_param("s", $peopleLicence);
             $stmt->execute();
-            $peopleID = $db->insert_id; // get the last inserted ID
-            echo "New people added successfully. People ID is: " . $peopleID . "<br>";
+            // $peopleLicence = $db->insert_id; // get the last inserted ID
+            echo "New people added successfully. This person licence is: " . $peopleLicence . "<br>";
         } else {
             // owner exists in database
             $row = $result->fetch_assoc();
-            $peopleID = $row['People_ID'];
-            echo "People already exists in database. People ID is: " . $peopleID . "<br>";
+            $peopleLicence = $row['people_licence'];
+            echo "People already exists in database. People licence is: " . $peopleLicence . "<br>";
         }
 
         // add vehicle to database
         $stmt = $db->prepare("INSERT INTO Vehicle (Vehicle_type, Vehicle_colour, Vehicle_licence) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $vehicleType, $vehicleColour, $vehicleLicence);
         $stmt->execute();
-        echo "New vehicle added successfully. Vehicle ID is: " . $db->insert_id . "<br>";
+        echo "New vehicle added successfully. Vehicle ID is: " . $vehicleLicence . "<br>";
 
         $ownerResult = queryVehicle($db, $vehicleLicence);
+
+
+        // add ownership to database
+        $stmt = $db->prepare("INSERT INTO Ownership (Vehicle_ID, People_ID) VALUES (?, ?)");
+        $stmt->bind_param("ss", $vehicleLicence, $peopleLicence);
+        $stmt->execute();
+        echo "New ownership added successfully. Vehicle licence is: " . $vehicleLicence . "<br>";
+
 
         // add ownership to database
         // $vehicleID = $ownerResult[0]["Vehicle_ID"];

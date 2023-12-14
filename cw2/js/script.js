@@ -8,8 +8,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // more form submissions here
 
-    if (document.getElementById("myInput")) {
-        autocomplete(document.getElementById("myInput"));
+    if (document.getElementById("addNewPersonForm")) {
+        ajaxFormSubmit("#addNewPersonForm", "inc/add_new_person.php");
+    }
+
+
+    if (document.getElementById("ownerAutocomplete")) {
+        autocomplete(document.getElementById("ownerAutocomplete"));
     }
 
     if (document.getElementById("mySearch")) {
@@ -23,9 +28,36 @@ document.addEventListener("DOMContentLoaded", function () {
             showMatches(document.getElementById("newmyInput").value);
         });
     }
+
     // check if side navigation bar is open or closed
     checkNavState();
 
+    // open new owner form
+    if (document.getElementById("newOwnerButton")) {
+        document.getElementById("newOwnerButton").addEventListener("click", function () {
+            openNewOwnerForm();
+        });
+    }
+
+    // close new owner form
+    if (document.getElementById("closeNewOwnerButton")) {
+        document.getElementById("closeNewOwnerButton").addEventListener("click", function () {
+            closeNewOwnerForm();
+        });
+    }
+
+
+    if (document.getElementById("openMdlBtn")) {
+        document.getElementById("openMdlBtn").addEventListener("click", function () {
+            openNewPersonForm();
+        });
+    }
+
+    if (document.getElementById("closeBtn")) {
+        document.getElementById("closeBtn").addEventListener("click", function () {
+            closeNewPersonForm();
+        });
+    }
 });
 
 function ajaxFormSubmit(formSelector, targetUrl) {
@@ -45,6 +77,50 @@ function ajaxFormSubmit(formSelector, targetUrl) {
         xhr.send(formData);
     });
 }
+
+// function ajaxAddPerson(formSelector, targetUrl) {
+//     document.querySelector(formSelector).addEventListener("submit", function (event) {
+//         event.preventDefault();    // stop the form from submitting
+
+//         var formData = new FormData(this);
+//         var xhr = new XMLHttpRequest();
+//         xhr.open("POST", targetUrl, true);
+
+//         xhr.onload = function () {
+//             if (this.status == 200) {
+//                 document.querySelector(".container").innerHTML = this.responseText;
+//             }
+//         };
+
+//         xhr.send(formData);
+//     });
+// }
+
+
+// document.getElementById("newPersonForm").addEventListener("submit", function (event) {
+//     event.preventDefault();
+
+//     var xhr = new XMLHttpRequest();
+//     xhr.open("POST", "path/to/your_php_script_for_adding_person.php", true);
+//     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+//     xhr.onload = function () {
+//         if (this.status == 200) {
+//             // 处理响应，例如将获取的人员执照放入 'owner' 输入栏中
+//             var response = JSON.parse(this.responseText);
+//             if (response.success) {
+//                 document.getElementById("ownerAutocomplete").value = response.peopleLicence;
+//                 closeNewOwnerForm(); // 关闭新增人员的表单
+//             } else {
+//                 // 处理错误
+//             }
+//         }
+//     };
+
+//     // 获取表单数据并发送
+//     var formData = new FormData(document.getElementById("newPersonForm"));
+//     xhr.send(new URLSearchParams(formData).toString());
+// });
+
 
 
 function validateForm() {
@@ -131,7 +207,8 @@ function searchMenu() {
 
     for (i = 0; i < li.length; i++) {
         a = li[i].getElementsByTagName("a")[0];
-        currentText = a.innerHTML.toUpperCase();
+        a_cleaned = a.innerHTML.replace(/<i[^>]*><\/i>/g, ""); // remove icons
+        currentText = a_cleaned.toUpperCase();
         found = true;
 
         // check if all characters in filter are found in currentText
@@ -218,11 +295,19 @@ function selectOwner(name) {
 
 
 function openNewOwnerForm() {
-    document.getElementById("newOwnerModal").style.display = "block";
+    document.getElementById("newPerson").style.display = "block";
 }
 
 function closeNewOwnerForm() {
-    document.getElementById("newOwnerModal").style.display = "none";
+    document.getElementById("newPerson").style.display = "none";
+}
+
+function openNewPersonForm() {
+    document.getElementById("openMdlBtn").style.display = "block";
+}
+
+function closeNewPersonForm() {
+    document.getElementById("openMdlBtn").style.display = "none";
 }
 
 
@@ -238,7 +323,6 @@ function boldMatchingCharacters(str, val) {
     }
     return result;
 }
-
 
 function autocomplete(inpElement) {
     // the autocomplete function takes one argument the text field element 
@@ -308,7 +392,7 @@ function autocomplete(inpElement) {
                         b.innerHTML = boldMatchingCharacters(personInfoCopy, val);
 
                         // insert a input field that will hold the current array item's value
-                        b.innerHTML += "<input type='hidden' value='" + people[i].People_name + " " + people[i].People_licence + "'>";
+                        b.innerHTML += "<input type='hidden' value='" + people[i].People_licence + "'>";
 
                         // execute a function when someone clicks on the item value (DIV element)
                         b.addEventListener("click", function (e) {
@@ -324,7 +408,7 @@ function autocomplete(inpElement) {
         };
         // xhr.open("GET", "inc/get_people.php?q=" + inpElement.value, true);
         xhr.open("GET", "inc/get_people.php?q=" + encodeURIComponent(inpElement.value.replace(/\s+/g, "")), true);
-        document.getElementById("myInput")
+        document.getElementById("ownerAutocomplete")
         xhr.send();
     });
 
@@ -402,7 +486,7 @@ function filterTable(inputID, tableID, columnNames) {
             }
         }
     }
-    
+
     // Loop through all table rows, and hide those who don't match the search query
     for (i = 1; i < tr.length; i++) { // start from 1 to skip the header row
         var displayRow = false;

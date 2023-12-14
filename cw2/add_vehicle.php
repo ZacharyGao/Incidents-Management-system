@@ -7,7 +7,9 @@ $info = $infoError = "";
 
 if (isset($_SESSION['username'])) {
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["type"]) && isset($_POST["colour"]) && isset($_POST["regNum"]) && isset($_POST["owner"])) {
+    if ($_SERVER["REQUEST_METHOD"] == "POST" 
+    // && isset($_POST["type"]) && isset($_POST["colour"]) && isset($_POST["regNum"]) && isset($_POST["owner"])
+    ) {
 
         if (empty($_POST["owner"])) {
             $infoError = "<p>Please enter owner info.</p>";
@@ -26,17 +28,17 @@ if (isset($_SESSION['username'])) {
             }
         }
 
-        // if (empty($_POST["type"]) || empty($_POST["colour"]) || empty($_POST["regNum"])) {
-        //     $infoError = "<p>Please enter all vehicle info.</p>";
-        // } else {
-        //     $info = filter_input(INPUT_POST, "type", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        //     // $info = clean_input($_POST['type']);
+        if (empty($_POST["type"]) || empty($_POST["colour"]) || empty($_POST["regNum"])) {
+            $infoError = "<p>Please enter all vehicle info.</p>";
+        } else {
+            $info = filter_input(INPUT_POST, "type", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            // $info = clean_input($_POST['type']);
 
-        //     $infoError =  "<p>New vehicle added:<br>Type: " . $_POST["type"] . "<br>Colour: " . $_POST["colour"] . "<br>regNum: " . $_POST["regNum"] . "<br>owner: " . $_POST["owner"] . "</p>";
-        //     // add vehicle
-        //     // echo $infoError;
-        //     addVehicle($db, $_POST["type"], $_POST["colour"], $_POST["regNum"], $_POST["owner"]);
-        // }
+            $infoError =  "<p>New vehicle added:<br>Type: " . $_POST["type"] . "<br>Colour: " . $_POST["colour"] . "<br>regNum: " . $_POST["regNum"] . "<br>owner: " . $_POST["owner"] . "</p>";
+            // add vehicle
+            // echo $infoError;
+            addVehicle($db, $_POST["type"], $_POST["colour"], $_POST["regNum"], $_POST["owner"]);
+        }
     } else {
         $infoError = "<p>Please enter all vehicle info.</p>";
     }
@@ -53,8 +55,33 @@ if (isset($_SESSION['username'])) {
         <label for="Owner">Owner <span style="color: red;">*</span></label>
 
         <div class="autocomplete">
-            <input id="myInput" type="text" name="ownerName" placeholder="person" style="display:inline;width:70%">
-            <button type="button" onclick="openNewOwnerForm()" style="padding:2px;margin:0rem 1rem;">New Person</button>
+            <input id="ownerAutocomplete" type="text" name="ownerName" placeholder="person" style="display:inline;width:70%">
+            <button id="newOwnerButton" type="button" onclick="openNewOwnerForm()" style="padding:2px;margin:0rem 1rem;">New Person</button>
+        </div>
+
+
+        <div class="form-popup" id="newPerson">
+            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" class="form-container" id="newPersonForm">
+                <h3>New Person</h3>
+
+                <label for="personName"><b>personName </b><span style="color:red;">*</span></label>
+                <input type="text" placeholder="Enter personName" name="personName" required>
+
+                <label for="licenceNum"><b>licenceNum </b><span style="color:red;">*</span></label>
+                <input type="text" placeholder="Enter licenceNum" name="licenceNum" required>
+
+                <label for="personDOB"><b>Date of Birth</b></label>
+                <input type="text" name="personDOB">
+
+                <label for="penaltyPoints"><b>penaltyPoints</b></label>
+                <input type="text" name="penaltyPoints">
+
+                <label for="address"><b>address</b></label>
+                <input type="text" name="address">
+
+                <button id="newPersonInfo" type="submit" class="btn">Confirm</button>
+                <button id="closeNewOwnerButton" type="button" class="btn cancel" onclick="closeNewOwnerForm()">Cancel</button>
+            </form>
         </div>
 
         <!-- <dialog id="newOwnerModal" class="modal">
@@ -64,17 +91,28 @@ if (isset($_SESSION['username'])) {
                 </form>
             </div>
         </dialog> -->
+
+
+        <!-- Trigger/Open The Modal -->
+        <!-- <button id="openMdlBtn">Open Modal</button> -->
+        <!-- <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <p>Some text in the Modal..</p>
+            </div>
+        </div> -->
+
         <br>
         <br>
         <label for="type">Vehicle type </label>
         <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="type" name="type">
         <label for="colour">Vehicle colour </label>
         <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="colour" name="colour">
-        <label for="regNum">Vehicle ID </label>
+        <label for="regNum">Vehicle licence </label>
         <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="regNum" name="regNum">
-
+        
+        <button type="submit" class="btn btn-primary">Add</button>
     </div>
-    <button type="submit" class="btn btn-primary">Add</button>
     <div class="invalid-feedback"><?php echo $infoError; ?></div>
 </form>
 

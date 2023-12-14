@@ -39,10 +39,32 @@
         <ul id="myMenu">
             <li><a href="index.php">CW2</a></li>
             <li><a href="dashboard.php">Dashboard</a></li>
-            <li><a href="search_people.php"><i class="fa fa-fw fa-user" style="color:white;border:0cap;margin:0;left:0;width:5px;padding:0 10px 0 0px;"></i> People</a></li>
+            <li><a href="search_people.php"><i class="fa fa-fw fa-user"></i> People</a></li>
+
+            <!-- <div class="dropdown">
+                <button class="dropbtn">Dropdown
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                    <a href="#">Link 3</a>
+                </div>
+            </div> -->
+
             <li><a href="search_vehicle.php">Vehicle</a></li>
             <li><a href="add_vehicle.php">AddVehicle</a></li>
             <li><a href="report.php">Report</a></li>
+<!-- 
+            <div class="dropdown">
+                <li><a class="dropbtn">Dropdown
+                        <i class="fa fa-caret-down"></i>
+                </li>
+                <div class="dropdown-content">
+                    <li><a href="#">Link 1</a></li>
+                    <li><a href="#">Link 2</a></li>
+                </div>
+            </div> -->
 
             <?php
             if (isset($_SESSION['role']) && $_SESSION['role'] == 'Administrator') {
