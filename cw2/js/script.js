@@ -1,15 +1,31 @@
 document.addEventListener("DOMContentLoaded", function () {
+
+    if (document.getElementById('newPersonForm')) {
+        document.getElementById('newPersonForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var licenceNum = document.getElementById('licenceNum').value;
+
+            // update the external 'owner' input field
+            document.getElementById('ownerAutocomplete').value = licenceNum;
+
+            addNewPersonToDatabase();
+
+            closeNewOwnerForm();
+        });
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('newPerson')) {
+                closeNewOwnerForm();
+            }
+        }
+    }
+
+
     if (document.querySelector("form[name='query_people']")) {
         ajaxFormSubmit("form[name='query_people']", "people_table.php");
     }
     if (document.querySelector("form[name='query_vehicles']")) {
         ajaxFormSubmit("form[name='query_vehicles']", "vehicles_table.php");
-    }
-
-    // more form submissions here
-
-    if (document.getElementById("newPerson")) {
-        ajaxFormSubmit("#newPerson", "inc/add_new_person.php");
     }
 
 
@@ -22,12 +38,6 @@ document.addEventListener("DOMContentLoaded", function () {
             searchMenu();
         });
     }
-
-    // if (document.getElementById("newmyInput")) {
-    //     document.getElementById("newmyInput").addEventListener("keyup", function () {
-    //         showMatches(document.getElementById("newmyInput").value);
-    //     });
-    // }
 
     // check if side navigation bar is open or closed
     checkNavState();
@@ -46,18 +56,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
-    // if (document.getElementById("openMdlBtn")) {
-    //     document.getElementById("openMdlBtn").addEventListener("click", function () {
-    //         openNewPersonForm();
-    //     });
-    // }
-
-    // if (document.getElementById("closeBtn")) {
-    //     document.getElementById("closeBtn").addEventListener("click", function () {
-    //         closeNewPersonForm();
-    //     });
-    // }
 });
 
 function ajaxFormSubmit(formSelector, targetUrl) {
@@ -230,7 +228,7 @@ function showMatches(inputText) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            console.log(this.responseText);
+            // console.log(this.responseText);
             document.getElementById("ownerMatches").innerHTML = this.responseText;
         }
     };
@@ -250,21 +248,37 @@ function selectOwner(name) {
 
 
 function openNewOwnerForm() {
-    document.getElementById("newPerson").style.display = "block";
+
+    if (document.getElementById("ownerAutocomplete").value != "") {
+        document.getElementById("licenceNum").value = document.getElementById("ownerAutocomplete").value;
+    }
+    else {
+        document.getElementById("licenceNum").value = "";
+    }
+
+
+    if (document.getElementById("newPerson").style.display = "none") {
+        document.getElementById("newPerson").style.display = "block";
+        document.getElementById("personName").focus();
+        document.getElementById("personName").select();
+
+        // console.log(document.getElementById("openNewOwnerForm"));
+        // newPersonForm.reset();
+    }
+    else if (document.getElementById("newPerson").style.display = "block") {
+        document.getElementById("newPerson").style.display = "none";
+    }
+
 }
 
 function closeNewOwnerForm() {
     document.getElementById("newPerson").style.display = "none";
-}
 
-function openNewPersonForm() {
-    document.getElementById("openMdlBtn").style.display = "block";
-}
+    if (document.getElementById("licenceNum").value != "") {
+        document.getElementById("ownerAutocomplete").value = document.getElementById("licenceNum").value;
+    }
 
-function closeNewPersonForm() {
-    document.getElementById("openMdlBtn").style.display = "none";
 }
-
 
 
 function boldMatchingCharacters(str, val) {
@@ -460,4 +474,25 @@ function filterTable(inputID, tableID, columnNames) {
         // display the row if any of the columns contains the filter
         tr[i].style.display = displayRow ? "" : "none";
     }
+}
+
+
+function addNewPersonToDatabase() {
+    var personName = document.getElementById('personName').value;
+    var licenceNum = document.getElementById('licenceNum').value;
+    var personDOB = document.getElementById('personDOB').value;
+    var penaltyPoints = document.getElementById('penaltyPoints').value;
+    var address = document.getElementById('address').value;
+
+    // send the data to the server
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            // console.log('Person added successfully');
+            document.getElementById('newPerson').innerHTML = this.responseText;
+        }
+    };
+    xhttp.open("POST", "inc/add_new_person.php", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send("personName=" + personName + "&licenceNum=" + licenceNum + "&personDOB=" + personDOB + "&penaltyPoints=" + penaltyPoints + "&address=" + address);
 }

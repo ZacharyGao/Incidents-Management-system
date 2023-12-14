@@ -137,7 +137,7 @@ function queryPeople($db, $name)
     return $people;
 }
 
-function addPerson($db, $name, $licence, $address=null, $personDOB=null, $personPoints=null)
+function addPerson($db, $name, $licence, $address = null, $personDOB = null, $personPoints = null)
 {
     queryPeople($db, $licence);
     if (!empty($people)) {
@@ -259,7 +259,7 @@ function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleL
     $vehicleType = clean_input($vehicleType);
     $vehicleColour = clean_input($vehicleColour);
     $vehicleLicence = clean_input($vehicleLicence);
-    $peopleLicence = clean_input($peopleLicence); // supposing by peopleID
+    $peopleLicence = clean_input($peopleLicence);
 
     $db->begin_transaction();
 
@@ -270,38 +270,52 @@ function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleL
         $searchedPeople = queryPeople($db, $peopleLicence);
 
         if (empty($searchedPeople)) {
-            echo "Person not found. Adding person: " . $peopleLicence . "<br>";
-            addPerson($db, "", $peopleLicence);
-            echo "New people added successfully. This person licence is: " . $peopleLicence . "<br>";
-            $peopleID = findPersonIDByLicence($db, $peopleLicence);
-        }
-        elseif (count($searchedPeople) > 1) {
-            echo "More than one people found. Please check.<br>";
-            printTable($searchedPeople);
+            // echo "Person not found. Please add this person: " . $peopleLicence . " first.<br>";
+            return false;
+
+        } elseif (count($searchedPeople) > 1) {
+            // echo "More than one people found. Please check.<br>";
+            // printTable($searchedPeople);
             return false;
         }
+        // exactly one people found, then add vehicle
         else {
-            echo "Found this person. People licence is: " . $peopleLicence . "<br>Adding vehicles.<br>";
+            // echo "Found this person. People licence is: " . $peopleLicence . "<br>Adding vehicles.<br>";
             $peopleID = findPersonIDByLicence($db, $peopleLicence);
+
+            $searchedVehicle = queryVehicle($db, $vehicleLicence);
+            if (empty($searchedVehicle)) {
+                
+                // echo "This is a new vehicle. Adding vehicle.<br>";
+
+                // add vehicle to database
+                $stmt = $db->prepare("INSERT INTO Vehicle (Vehicle_type, Vehicle_colour, Vehicle_licence) VALUES (?, ?, ?)");
+                $stmt->bind_param("sss", $vehicleType, $vehicleColour, $vehicleLicence);
+                $stmt->execute();
+                echo "New vehicle added successfully. Vehicle licence is: " . $vehicleLicence . "<br>";
+                $vehicleID = findVehicleIDByLicence($db, $vehicleLicence);
+
+                // add ownership to database
+                $stmt = $db->prepare("INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES (?, ?)");
+                $stmt->bind_param("ss", $peopleID, $vehicleID);
+                $stmt->execute();
+                echo "New ownership added successfully. Vehicle licence is: " . $vehicleLicence . " and owner is: " . $peopleLicence . "<br>";
+
+                $db->commit();
+            }
+            else{
+                echo "This vehicle is an existed vehicle. Vehicle licence is: " . $vehicleLicence . "<br>";
+                $vehicleID = findVehicleIDByLicence($db, $vehicleLicence);
+
+                // add ownership to database
+                $stmt = $db->prepare("INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES (?, ?)");
+                $stmt->bind_param("ss", $peopleID, $vehicleID);
+                $stmt->execute();
+                echo "New ownership added successfully. Vehicle licence is: " . $vehicleLicence . " and owner is: " . $peopleLicence . "<br>";
+
+                $db->commit();
+            }
         }
-
-        // add vehicle to database
-        $stmt = $db->prepare("INSERT INTO Vehicle (Vehicle_type, Vehicle_colour, Vehicle_licence) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $vehicleType, $vehicleColour, $vehicleLicence);
-        $stmt->execute();
-        echo "New vehicle added successfully. Vehicle ID is: " . $vehicleLicence . "<br>";
-        $vehicleID = findVehicleIDByLicence($db, $vehicleLicence);
-
-        // $ownerResult = queryVehicle($db, $vehicleLicence);
-
-
-        // add ownership to database
-        $stmt = $db->prepare("INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES (?, ?)");
-        $stmt->bind_param("ss", $peopleID, $vehicleID);
-        $stmt->execute();
-        echo "New ownership added successfully. Vehicle licence is: " . $vehicleLicence . "<br>";
-
-        $db->commit();
 
         $db->autocommit(TRUE); // turn off transactions + commit queued queries
 

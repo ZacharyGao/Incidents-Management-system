@@ -69,7 +69,7 @@
             <?php
             if (isset($_SESSION['role']) && $_SESSION['role'] == 'Administrator') {
             ?>
-                <li><a href="search_fine.php">Fine</a></li>
+                <li><a href="fine.php">Fine</a></li>
                 <li><a href="search_audit.php">Audit</a></li>
                 <li><a href="add_police.php">Add Police User</a></li>
             <?php } else {
