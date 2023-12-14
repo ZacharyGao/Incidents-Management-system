@@ -36,9 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_username'], $_POST
 
 <form action="" method="post">
     <label for="new_username">New Police Username:</label>
-    <input type="text" name="new_username"><br>
+    <input type="text" name="new_username" id="new_username"><br>
     <label for="new_password">Password:</label>
-    <input type="text" name="new_password"><br>
+    <input type="text" name="new_password" id="new_password"><br>
     <label for="police_role">Role:</label>
     <select name="police_role" id="police_role">
         <option value="Administrator">Administrator</option>

@@ -102,7 +102,6 @@ function login($db, $username, $password)
         $row = $result->fetch_assoc();
 
         // Set session variables
-        // session_start();
         $_SESSION['loggedin'] = true;
         $_SESSION['username'] = $username;
         $_SESSION['role'] = $row['Police_role'];
@@ -113,7 +112,6 @@ function login($db, $username, $password)
     } else {
         global $LoginError;
         $LoginError = "<p>Invalid username or password.</p>";
-        // echo "<p>Invalid username or password.</p>";
     }
 }
 
@@ -141,6 +139,12 @@ function queryPeople($db, $name)
 
 function addPerson($db, $name, $licence, $address=null, $personDOB=null, $personPoints=null)
 {
+    queryPeople($db, $licence);
+    if (!empty($people)) {
+        echo "People already exists in database. People licence is: " . $licence . "<br>";
+        return false;
+    }
+
     $name = clean_input($name);
     $licence = clean_input($licence);
 
@@ -153,9 +157,56 @@ function addPerson($db, $name, $licence, $address=null, $personDOB=null, $person
     return $result;
 }
 
+function findPersonIDByLicence($db, $licence)
+{
+    $stmt = $db->prepare("SELECT * FROM People WHERE People_licence LIKE ?");
+    $licence = "%$licence%";
+    $stmt->bind_param("s", $licence);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $people = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    return $people[0]["People_ID"];
+}
+
+function findVehicleIDByLicence($db, $licence)
+{
+    $stmt = $db->prepare("SELECT * FROM Vehicle WHERE Vehicle_licence LIKE ?");
+    $newlicence = "%$licence%";
+    $stmt->bind_param("s", $newlicence);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $vehicle = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    if (empty($vehicle)) {
+        echo "Vehicle not found. Please add this vehicle first. Vehicle licence is: " . $licence . "<br>";
+        return false;
+    }
+    return $vehicle[0]["Vehicle_ID"];
+}
+
+function findOffenceIDByDescription($db, $description)
+{
+    $stmt = $db->prepare("SELECT * FROM Offence WHERE Offence_description LIKE ?");
+    $description = "%$description%";
+    $stmt->bind_param("s", $description);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $offence = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    return $offence[0]["Offence_ID"];
+}
+
+function findIncidentIDByReport($db, $report)
+{
+    $stmt = $db->prepare("SELECT * FROM Incident WHERE Report_ID LIKE ?");
+    $report = "%$report%";
+    $stmt->bind_param("s", $report);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $incident = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    return $incident[0]["Incident_ID"];
+}
+
 function queryVehicle($db, $info)
 {
-
     $stmt = $db->prepare("SELECT Vehicle.*, People.* FROM Vehicle 
         LEFT JOIN Ownership ON Vehicle.Vehicle_ID = Ownership.Vehicle_ID 
         LEFT JOIN People ON Ownership.People_ID = People.People_ID 
@@ -168,6 +219,23 @@ function queryVehicle($db, $info)
 
     $vehicle = mysqli_fetch_all($result, MYSQLI_ASSOC);
     return $vehicle;
+}
+
+function queryIncident($db, $info)
+{
+    $stmt = $db->prepare("SELECT Incident.*, Vehicle.*, People.*, Offence.* FROM Incident 
+        LEFT JOIN Vehicle ON Incident.Vehicle_ID = Vehicle.Vehicle_ID 
+        LEFT JOIN People ON Incident.People_ID = People.People_ID 
+        LEFT JOIN Offence ON Incident.Offence_ID = Offence.Offence_ID 
+        WHERE Incident.Incident_Date LIKE ? OR Incident.Incident_Report LIKE ?");
+
+    $info = "%$info%";
+    $stmt->bind_param("ss", $info, $info);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $incident = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    return $incident;
 }
 
 function queryOffences($db, $info)
@@ -183,19 +251,7 @@ function queryOffences($db, $info)
     return $offences;
 }
 
-function queryIncidents($db, $info)
-{
-    $stmt = $db->prepare("SELECT * FROM Incident WHERE Incident_ID LIKE ? OR Incident_type LIKE ? OR Incident_date LIKE ? OR Incident_time LIKE ? OR Incident_location LIKE ? OR Incident_people_involved LIKE ? OR Incident_vehicle_involved LIKE ? OR Incident_description LIKE ? OR Incident_fine LIKE ? OR Incident_points LIKE ? OR Incident_status LIKE ?");
 
-    $info = "%$info%";
-    $stmt->bind_param("sssssssss
-    s", $info, $info, $info, $info, $info, $info, $info, $info, $info, $info);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $incidents = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    return $incidents;
-}
 
 function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleLicence)
 {
@@ -211,24 +267,22 @@ function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleL
         $db->autocommit(FALSE); //turn on transactions
 
         // check if people exists
-        $stmt = $db->prepare("SELECT * FROM People WHERE People_licence = ?");
-        $stmt->bind_param("s", $peopleLicence);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $searchedPeople = queryPeople($db, $peopleLicence);
 
-        // add people if not exists
-        if ($result->num_rows == 0) {
-            // owner does not exist in database
-            $stmt = $db->prepare("INSERT INTO People (People_ID) VALUES (?)");
-            $stmt->bind_param("s", $peopleLicence);
-            $stmt->execute();
-            // $peopleLicence = $db->insert_id; // get the last inserted ID
+        if (empty($searchedPeople)) {
+            echo "Person not found. Adding person: " . $peopleLicence . "<br>";
+            addPerson($db, "", $peopleLicence);
             echo "New people added successfully. This person licence is: " . $peopleLicence . "<br>";
-        } else {
-            // owner exists in database
-            $row = $result->fetch_assoc();
-            $peopleLicence = $row['people_licence'];
-            echo "People already exists in database. People licence is: " . $peopleLicence . "<br>";
+            $peopleID = findPersonIDByLicence($db, $peopleLicence);
+        }
+        elseif (count($searchedPeople) > 1) {
+            echo "More than one people found. Please check.<br>";
+            printTable($searchedPeople);
+            return false;
+        }
+        else {
+            echo "Found this person. People licence is: " . $peopleLicence . "<br>Adding vehicles.<br>";
+            $peopleID = findPersonIDByLicence($db, $peopleLicence);
         }
 
         // add vehicle to database
@@ -236,35 +290,16 @@ function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleL
         $stmt->bind_param("sss", $vehicleType, $vehicleColour, $vehicleLicence);
         $stmt->execute();
         echo "New vehicle added successfully. Vehicle ID is: " . $vehicleLicence . "<br>";
+        $vehicleID = findVehicleIDByLicence($db, $vehicleLicence);
 
-        $ownerResult = queryVehicle($db, $vehicleLicence);
+        // $ownerResult = queryVehicle($db, $vehicleLicence);
 
 
         // add ownership to database
-        $stmt = $db->prepare("INSERT INTO Ownership (Vehicle_ID, People_ID) VALUES (?, ?)");
-        $stmt->bind_param("ss", $vehicleLicence, $peopleLicence);
+        $stmt = $db->prepare("INSERT INTO Ownership (People_ID, Vehicle_ID) VALUES (?, ?)");
+        $stmt->bind_param("ss", $peopleID, $vehicleID);
         $stmt->execute();
         echo "New ownership added successfully. Vehicle licence is: " . $vehicleLicence . "<br>";
-
-
-        // add ownership to database
-        // $vehicleID = $ownerResult[0]["Vehicle_ID"];
-        $peopleName = $ownerResult[0]["People_name"];
-        echo "People name is: " . $peopleName . "<br>";
-
-        // $peopleID = $ownerResult[0]["People_ID"];
-
-        // $stmt = $db->prepare("INSERT INTO People (People_name) 
-        //     VALUES (?)");
-        // $stmt->bind_param("s", $peopleName);
-        // $stmt->execute();
-        // $result = $stmt->get_result();
-
-        // $stmt = $db->prepare("INSERT INTO Ownership (Vehicle_ID, People_ID) 
-        //     VALUES (?, ?)");
-        // $stmt->bind_param("ss", $vehicleID, $peopleID);
-        // $stmt->execute();
-        // $result = $stmt->get_result();
 
         $db->commit();
 

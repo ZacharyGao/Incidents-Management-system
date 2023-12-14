@@ -1,5 +1,5 @@
 <?php
-// 引入数据库连接和相关函数
+// add_new_person.php
 include_once 'config.php';
 include_once 'functions.php';
 

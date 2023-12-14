@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // more form submissions here
 
-    if (document.getElementById("addNewPersonForm")) {
-        ajaxFormSubmit("#addNewPersonForm", "inc/add_new_person.php");
+    if (document.getElementById("newPerson")) {
+        ajaxFormSubmit("#newPerson", "inc/add_new_person.php");
     }
 
 
@@ -23,11 +23,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    if (document.getElementById("newmyInput")) {
-        document.getElementById("newmyInput").addEventListener("keyup", function () {
-            showMatches(document.getElementById("newmyInput").value);
-        });
-    }
+    // if (document.getElementById("newmyInput")) {
+    //     document.getElementById("newmyInput").addEventListener("keyup", function () {
+    //         showMatches(document.getElementById("newmyInput").value);
+    //     });
+    // }
 
     // check if side navigation bar is open or closed
     checkNavState();
@@ -47,17 +47,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    if (document.getElementById("openMdlBtn")) {
-        document.getElementById("openMdlBtn").addEventListener("click", function () {
-            openNewPersonForm();
-        });
-    }
+    // if (document.getElementById("openMdlBtn")) {
+    //     document.getElementById("openMdlBtn").addEventListener("click", function () {
+    //         openNewPersonForm();
+    //     });
+    // }
 
-    if (document.getElementById("closeBtn")) {
-        document.getElementById("closeBtn").addEventListener("click", function () {
-            closeNewPersonForm();
-        });
-    }
+    // if (document.getElementById("closeBtn")) {
+    //     document.getElementById("closeBtn").addEventListener("click", function () {
+    //         closeNewPersonForm();
+    //     });
+    // }
 });
 
 function ajaxFormSubmit(formSelector, targetUrl) {
@@ -77,50 +77,6 @@ function ajaxFormSubmit(formSelector, targetUrl) {
         xhr.send(formData);
     });
 }
-
-// function ajaxAddPerson(formSelector, targetUrl) {
-//     document.querySelector(formSelector).addEventListener("submit", function (event) {
-//         event.preventDefault();    // stop the form from submitting
-
-//         var formData = new FormData(this);
-//         var xhr = new XMLHttpRequest();
-//         xhr.open("POST", targetUrl, true);
-
-//         xhr.onload = function () {
-//             if (this.status == 200) {
-//                 document.querySelector(".container").innerHTML = this.responseText;
-//             }
-//         };
-
-//         xhr.send(formData);
-//     });
-// }
-
-
-// document.getElementById("newPersonForm").addEventListener("submit", function (event) {
-//     event.preventDefault();
-
-//     var xhr = new XMLHttpRequest();
-//     xhr.open("POST", "path/to/your_php_script_for_adding_person.php", true);
-//     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-//     xhr.onload = function () {
-//         if (this.status == 200) {
-//             // 处理响应，例如将获取的人员执照放入 'owner' 输入栏中
-//             var response = JSON.parse(this.responseText);
-//             if (response.success) {
-//                 document.getElementById("ownerAutocomplete").value = response.peopleLicence;
-//                 closeNewOwnerForm(); // 关闭新增人员的表单
-//             } else {
-//                 // 处理错误
-//             }
-//         }
-//     };
-
-//     // 获取表单数据并发送
-//     var formData = new FormData(document.getElementById("newPersonForm"));
-//     xhr.send(new URLSearchParams(formData).toString());
-// });
-
 
 
 function validateForm() {
@@ -193,7 +149,6 @@ function checkNavState() {
         }
     }
 }
-
 
 
 
@@ -313,16 +268,15 @@ function closeNewPersonForm() {
 
 
 function boldMatchingCharacters(str, val) {
-    var result = str;
-    for (var i = 0; i < val.length; i++) {
-        if (val[i] === " ") continue;
-        var re = new RegExp(val[i], "gi");
-        result = result.replace(re, function (match) {
-            return "<strong>" + match + "</strong>";
-        });
-    }
-    return result;
+    // with regex
+    var pattern = val.replace(/\s+/g, '').split('').join('|');
+    var re = new RegExp(pattern, "gi");
+
+    return str.replace(re, function (match) {
+        return "<strong>" + match + "</strong>";
+    });
 }
+
 
 function autocomplete(inpElement) {
     // the autocomplete function takes one argument the text field element 

@@ -34,10 +34,10 @@ if (isset($_SESSION['username'])) {
         <div class="invalid-feedback"><?php echo $infoError; ?></div>
     </div>
     <button type="submit" class="btn btn-primary">Search</button>
-    <button type="submit" class="btn btn-primary" name="showAllPeople">Show all people</button>
+    <!-- <button type="submit" class="btn btn-primary" name="showAllPeople">Show all people</button> -->
 </form>
 
-<form method="post" style="border:none; box-shadow:none;margin:0;padding:0;">
+<form method="post" style="border:none; box-shadow:none;margin:2%;padding:0;">
     <button type="submit" class="btn btn-primary" name="showAllPeople" style="padding:1%">Show all people</button>
 </form>
 

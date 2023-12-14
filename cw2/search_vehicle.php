@@ -39,7 +39,7 @@ if (isset($_SESSION['username'])) {
 <!-- form to search vehicle -->
 <form action="search_vehicle.php" method="post" name="query_vehicle">
     <div class="form-group">
-        <label for="name">Search Vehicle:</label>
+        <label for="regNum">Search Vehicle:</label>
         <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="regNum" name="info" placeholder="Enter vehicle registration number" onkeyup='filterTable("regNum", "searchVehicleTable", ["Vehicle_licence"])'>
         <div class="invalid-feedback"><?php echo $infoError; ?></div>
     </div>
