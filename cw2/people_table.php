@@ -34,7 +34,7 @@ if (!empty($info)) {
     } else {
         echo "<p>No results found.</p>";
         echo "<p>Do you want to add this person to the database? </p>";
-        echo "<a href='add_person.php'>Add Person</a>";
+        echo '<button id="newOwnerButton" type="button" onclick="openNewOwnerForm()" style="padding:1rem;margin:0rem 0rem;">Add New Person</button>';
     }
 } else {
     echo "<p>Please enter a name or licence number.</p>";

@@ -20,13 +20,11 @@ if (isset($_SESSION['username'])) {
         }
     } 
     // else {
-        // $infoError = "<p>Please enter vehicle registration number.</p>";
         // $vehicle = queryVehicle($db, "");
         $vehicle = [];
         if (isset($_POST["showAllVehicles"])) {
             $vehicle = queryVehicle($db, "");
         }
-    // }
     // $vehicle = queryVehicle($db, "");
 
 } else {
@@ -46,18 +44,14 @@ if (isset($_SESSION['username'])) {
     <button type="submit" class="btn btn-primary">Search</button>
     <button type="submit" class="btn btn-primary" name="showAllVehicles">Show all vehicles</button>
 </form>
-<button class="btn btn-primary" onclick="window.location.href='add_vehicle.php'">Add New Vehicle</button>
+<!-- <button class="btn btn-primary" onclick="window.location.href='add_vehicle.php'">Add New Vehicle</button> -->
 
 
-
-<!-- <form method="post" style="border:none; box-shadow:none;margin:0;padding:0;">
-    <button type="submit" class="btn btn-primary" name="showAllVehicles" style="padding:1%">Show all vehicles</button>
-</form> -->
 
 
 <table class="table table-striped" id="searchVehicleTable">
     <?php if (empty($vehicle)) : ?>
-        <p>No results found.</p>
+        <p>No results found. <a href="add_vehicle.php">Add Vehicle</a></p>
     <?php else : ?>
         <p>Found <?php echo count($vehicle); ?> results.</p>
         <thead>

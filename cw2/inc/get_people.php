@@ -5,11 +5,6 @@ include_once("functions.php");
 
 $q = $_GET['q'];
 
-// change array to json
-// echo json_encode($people);
-// echo $q;
-// echo "<br>";
-
 // search database for matched people
 $people = queryPeople($db, $q);
 
@@ -19,6 +14,8 @@ if (empty($people)) {
     // echo "<a href='add_person.php'>Add Person</a>";
     exit;
 }
+
+// change array to json
 echo json_encode($people);
 
 

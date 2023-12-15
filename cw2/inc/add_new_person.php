@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     addPerson($db, $personName, $licenceNum, $address, $personDOB, $penaltyPoints,);
 
     // response success message
-    echo "New person <strong>".$personName."</strong> added successfully.<br> You can now add a new vehicle now.";
+    echo "New person <strong>".$personName."</strong> added successfully.<br>";
 
     unset($_SESSION['addedPersonName']);
     $_SESSION['addedPersonName'] = $personName;

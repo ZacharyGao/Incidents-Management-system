@@ -35,8 +35,5 @@ require_once "inc/header.php";
     <button type="submit" class="btn btn-primary">Login</button>
 </form>
 
-<!-- login function -->
-<?php
-?>
 
 <?php include "inc/footer.php"; ?>

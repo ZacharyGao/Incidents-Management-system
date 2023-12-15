@@ -477,6 +477,46 @@ function filterTable(inputID, tableID, columnNames) {
 }
 
 
+function filterTableByName(inputName, tableID, columnNames) {
+    var input, filter, table, tr, columnIndices = [], i, j, txtValue;
+    // input = document.getElementById(inputID);
+    input = document.getElementsByName(inputName)[0];
+    filter = input.value.toUpperCase().replace(/\s+/g, "");
+    table = document.getElementById(tableID);
+    tr = table.getElementsByTagName("tr");
+
+    // find the indices of the columns to be filtered by name
+    if (tr.length > 0) {
+        var headers = tr[0].getElementsByTagName("th");
+        for (i = 0; i < headers.length; i++) {
+            if (columnNames.indexOf(headers[i].textContent) > -1) {
+                columnIndices.push(i);
+            }
+        }
+    }
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 1; i < tr.length; i++) { // start from 1 to skip the header row
+        var displayRow = false;
+
+        // check if any of the columns contains the filter
+        for (j = 0; j < columnIndices.length; j++) {
+            var td = tr[i].getElementsByTagName("td")[columnIndices[j]];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    displayRow = true;
+                    break;
+                }
+            }
+        }
+
+        // display the row if any of the columns contains the filter
+        tr[i].style.display = displayRow ? "" : "none";
+    }
+}
+
+
 function addNewPersonToDatabase() {
     var personName = document.getElementById('personName').value;
     var licenceNum = document.getElementById('licenceNum').value;
@@ -511,3 +551,11 @@ function addNewPersonToDatabase() {
 
     // xhr.send(formData);
 }
+
+
+document.getElementById("query_people").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        document.querySelector("#query_people button[type='submit']").click();
+    }
+});

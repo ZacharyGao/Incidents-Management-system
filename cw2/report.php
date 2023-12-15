@@ -145,7 +145,7 @@ if (isset($_SESSION['username'])) {
 <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" name="query_report">
     <div class="form-group">
         <label for="report">Search Report:</label>
-        <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="report" name="report" placeholder="search">
+        <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="report" name="report" placeholder="Enter date or report statement">
         <div class="invalid-feedback"><?php echo $infoError; ?></div>
     </div>
     <button type="submit" class="btn btn-primary">Search</button>

@@ -148,8 +148,44 @@ function addPerson($db, $name, $licence, $address = null, $personDOB = null, $pe
     $name = clean_input($name);
     $licence = clean_input($licence);
 
-    $stmt = $db->prepare("INSERT INTO People (People_name, People_licence) VALUES (?, ?)");
-    $stmt->bind_param("ss", $name, $licence);
+    if ($address) {
+        $address = clean_input($address);
+    }
+    if ($personDOB) {
+        $personDOB = clean_input($personDOB);
+    }
+    if ($personPoints) {
+        $personPoints = clean_input($personPoints);
+    }
+
+    // add person to database
+    // if ($address && $personDOB && $personPoints) {
+    //     $stmt = $db->prepare("INSERT INTO People (People_name, People_licence, People_address, People_DOB, People_points) VALUES (?, ?, ?, ?, ?)");
+    //     $stmt->bind_param("sssss", $name, $licence, $address, $personDOB, $personPoints);
+    // } elseif ($address && $personDOB) {
+    //     $stmt = $db->prepare("INSERT INTO People (People_name, People_licence, People_address, People_DOB) VALUES (?, ?, ?, ?)");
+    //     $stmt->bind_param("ssss", $name, $licence, $address, $personDOB);
+    // } elseif ($address && $personPoints) {
+    //     $stmt = $db->prepare("INSERT INTO People (People_name, People_licence, People_address, People_points) VALUES (?, ?, ?, ?)");
+    //     $stmt->bind_param("ssss", $name, $licence, $address, $personPoints);
+    // } elseif ($personDOB && $personPoints) {
+    //     $stmt = $db->prepare("INSERT INTO People (People_name, People_licence, People_DOB, People_points) VALUES (?, ?, ?, ?)");
+    //     $stmt->bind_param("ssss", $name, $licence, $personDOB, $personPoints);
+    // } else
+    if ($address) {
+        $stmt = $db->prepare("INSERT INTO People (People_name, People_licence, People_address) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $name, $licence, $address);
+        // } elseif ($personDOB) {
+        //     $stmt = $db->prepare("INSERT INTO People (People_name, People_licence, People_DOB) VALUES (?, ?, ?)");
+        //     $stmt->bind_param("sss", $name, $licence, $personDOB);
+        // } elseif ($personPoints) {
+        //     $stmt = $db->prepare("INSERT INTO People (People_name, People_licence, People_points) VALUES (?, ?, ?)");
+        //     $stmt->bind_param("sss", $name, $licence, $personPoints);
+    } else {
+        $stmt = $db->prepare("INSERT INTO People (People_name, People_licence) VALUES (?, ?)");
+        $stmt->bind_param("ss", $name, $licence);
+    }
+
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -166,17 +202,10 @@ function findPersonIDByLicence($db, $licence)
     } elseif (count($people) == 1) {
         return $people[0]['People_ID'];
     } else {
-        // echo "More than one people found. Please check.<br>";
-        return $people[0]['People_ID'];
+        echo "More than one people found. Please check.<br>";
+        return null;
     }
 
-
-    // foreach ($people as $person) {
-    //     if ($person['People_licence'] == $licence) {
-    //         return $person['People_ID']; // ID
-    //     }
-    // }
-    // return null; // not found
 }
 
 function findVehicleIDByLicence($db, $licence)
@@ -193,12 +222,6 @@ function findVehicleIDByLicence($db, $licence)
         return null;
     }
 
-    // foreach ($vehicles as $vehicle) {
-    //     if ($vehicle['Vehicle_licence'] == $licence) {
-    //         return $vehicle['Vehicle_ID']; // ID
-    //     }
-    // }
-    // return null; 
 }
 
 function findOffenceIDByDescription($db, $description)

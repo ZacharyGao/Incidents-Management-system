@@ -63,9 +63,6 @@ if (isset($_SESSION['username'])) {
     } else {
         echo "<p>You are not an administrator.</p>";
 
-        // echo "<script type='text/javascript'>";
-        // echo "window.location.href='dashboard.php'";
-        // echo "</script>";
     }
 } else {
     pleaseLogin();

@@ -9,17 +9,28 @@ if (isset($_SESSION['username'])) {
     // form validation
     if (isset($_POST["info"])) {
         if (empty($_POST["info"])) {
-            $infoError = "<p>Please enter name or licence info.</p>";
+            // $infoError = "<p>Please enter name or licence info.</p>";
         } else {
             $info = filter_input(INPUT_POST, "info", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-            $infoError =  "<p>You searched for: " . $_POST["info"] . "</p>";
+            // $infoError =  "<p>You searched for: " . $_POST["info"] . "</p>";
             // search people
             $people = queryPeople($db, $_POST["info"]);
         }
     }
     $people = [];
-    if (isset($_POST["showAllPeople"])) {
+
+    if (isset($_POST["showAllFlag"]) && $_POST["showAllFlag"] == '1') {
         $people = queryPeople($db, "");
+        $_POST["showAllFlag"] = '0';
+    }
+    
+
+    if (isset($_SESSION['addedPersonName'])) {
+
+        $addNewPersonInfo = "<p>New person <strong>" . $_SESSION['addedPersonName'] . "</strong> added successfully.</p>";
+        unset($_SESSION['addedPersonName']);
+    } else {
+        $addNewPersonInfo = "";
     }
 } else {
     pleaseLogin();
@@ -27,20 +38,37 @@ if (isset($_SESSION['username'])) {
 ?>
 
 
-<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" name="query_people">
+<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" name="query_people" id="query_people">
     <div class="form-group">
-        <label for="name">Search People:</label>
-        <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="name" name="info" placeholder="Enter name or licence" onkeyup='filterTable("name", "searchPeople", ["People_name", "People_license"])'>
+
+        <label for="ownerAutocomplete">Search People:</label>
+
+        <div class="autocomplete">
+
+            <input id="ownerAutocomplete" class="form-control" type="text" name="info" placeholder="Enter name or licence" style="display:inline;width:100%" onkeyup='filterTableByName("info", "searchPeople", ["People_name", "People_license"])'>
+
+        </div>
+        <div class="feedback-container" id="addNewPersonInfo" name="addNewPersonInfo"><?php echo $addNewPersonInfo; ?></div>
+
+        <button type="submit" class="btn btn-primary">Search</button>
+
+        <button type="button" class="btn btn-primary" name="showAllPeople" id="showAllPeople">Show all people</button>
+
+        <input type="hidden" id="showAllFlag" name="showAllFlag" value="0">
+
+        <button id="newOwnerButton" type="button" onclick="openNewOwnerForm()">New Person</button>
+
         <div class="invalid-feedback"><?php echo $infoError; ?></div>
     </div>
-    <button type="submit" class="btn btn-primary">Search</button>
-    <!-- <button type="submit" class="btn btn-primary" name="showAllPeople">Show all people</button> -->
 </form>
 
-<form method="post" style="border:none; box-shadow:none;margin:2%;padding:0;">
-    <button type="submit" class="btn btn-primary" name="showAllPeople" style="padding:1%">Show all people</button>
-</form>
 
+<script>
+document.getElementById('showAllPeople').addEventListener('click', function() {
+    document.getElementById('showAllFlag').value = '1';
+    document.getElementById('query_people').submit();
+});
+</script>
 
 <!-- table to show people info -->
 <div class="container">
@@ -76,6 +104,37 @@ if (isset($_SESSION['username'])) {
     </div>
 </div>
 
+
+<!-- form to add new person -->
+<div class="modal" id="newPerson">
+    <span onclick="document.getElementById('modalForAddPersonID').style.display='none'" class="close" title="Close Modal">&times;</span>
+
+    <form action="" method="post" class="modal-content" id="newPersonForm" name="newPersonForm">
+        <div class="container">
+
+            <h3>New Person</h3>
+
+            <label for="personName"><b>personName </b><span style="color:red;">*</span></label>
+            <input type="text" placeholder="Enter personName" id="personName">
+
+            <label for="licenceNum"><b>licenceNum </b><span style="color:red;">*</span></label>
+            <input type="text" placeholder="Enter licenceNum" id="licenceNum">
+
+            <label for="personDOB"><b>Date of Birth</b></label>
+            <input type="text" id="personDOB">
+
+            <label for="penaltyPoints"><b>penaltyPoints</b></label>
+            <input type="text" id="penaltyPoints">
+
+            <label for="address"><b>address</b></label>
+            <input type="text" id="address">
+
+            <button id="newPersonInfo" type="submit" name="submit" class="btn">Confirm</button>
+            <button id="closeNewOwnerButton" type="button" class="btn cancel" onclick="closeNewOwnerForm()">Cancel</button>
+        </div>
+
+    </form>
+</div>
 
 
 <?php include "inc/footer.php"; ?>
