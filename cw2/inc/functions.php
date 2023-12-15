@@ -493,3 +493,27 @@ function associateFineToReport($db, $fineAmount, $finePoints, $incidentID)
         echo "Error associating fine to report.";
     }
 }
+
+function addFine($db, $fineAmount, $finePoints, $incidentID)
+{
+    // check if fine exists
+    $sql = "SELECT * FROM Fines WHERE Incident_ID = " . $incidentID;
+    $result = mysqli_query($db, $sql);
+    $searchedFine = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    if (!empty($searchedFine)) {
+        echo "This incidents has been already assigned a fine. Incident ID is: " . $incidentID . "<br>";
+        return false;
+    }
+
+    // add fine to database
+    $stmt = $db->prepare("INSERT INTO Fines (Fine_amount, Fine_points, Incident_ID) VALUES (?, ?, ?)");
+    $stmt->bind_param("ssi", $fineAmount, $finePoints, $incidentID);
+    $excResult = $stmt->execute();
+    if ($excResult) {
+        echo "New fine added successfully.";
+    } else {
+        echo "Failed to add fine. Incident ID is: " . $incidentID . "<br>";
+        return false;
+    }
+}

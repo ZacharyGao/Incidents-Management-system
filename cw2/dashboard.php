@@ -11,14 +11,27 @@ if (isset($_SESSION['username'])) {
     echo "Your role is <strong>" . $_SESSION['role'] . "</strong>.<br><br>";
 ?>
 
-    <button class="btn btn-primary" onclick="window.location.href='search_people.php'">Search People</button>
+    <button class="btn btn-primary" onclick="window.location.href='search_people.php'" style="margin:1rem 0rem">Search People</button>
     <button class="btn btn-primary" onclick="window.location.href='search_vehicle.php'">Search Vehicle</button>
-    <button class="btn btn-primary" onclick="window.location.href='add_vehicle.php'">Add New Vehicle</button>
-    <button class="btn btn-primary" onclick="window.location.href='Fine.php'" style="margin:1rem 0rem">Fine</button>
+    <button class="btn btn-primary" onclick="window.location.href='add_vehicle.php'" style="margin:1rem 0rem">Add New Vehicle</button>
+    <button class="btn btn-primary" onclick="window.location.href='report.php'">Report</button>
+    <br>
+    <button class="btn btn-primary" onclick="window.location.href='change_pw.php'" style="margin:1rem 0rem">Change Password</button>
+
+
+    <?php
+    if (isset($_SESSION['role']) && $_SESSION['role'] == 'Administrator') {
+    ?>
+        <button class="btn btn-primary" onclick="window.location.href='Fine.php'" style="margin:1rem 0rem">Fine</button>
+        <button class="btn btn-primary" onclick="window.location.href='add_police.php'">Add Police User</button>
+        <button class="btn btn-primary" onclick="window.location.href='search_audit.php'"style="margin:1rem 0rem">Audit</button>
+    <?php } else {
+    } ?>
+
+    <br>
     <button class="btn btn-primary" onclick="window.location.href='add_people.php'">Add New People</button>
     <button class="btn btn-primary" onclick="window.location.href='search_audit.php'">Audit</button>
     <button class="btn btn-primary" onclick="window.location.href='add_police.php'">Add Police User</button>
-    <button class="btn btn-primary" onclick="window.location.href='change_pw.php'">Change Password</button>
 
     <ul>
         <li><a href="index.php">Home</a></li>

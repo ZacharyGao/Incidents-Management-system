@@ -63,15 +63,5 @@
 <h4>7 Administrator can review Audit log</h4>
 <p>To support various regulatory and statutory requirements, police need to <strong>have access to an audit trail</strong> to account for <strong>database record accesses and changes that are made (e.g., deletions, updates, etc.)</strong>. Implement a basic auditing feature in the web interface which will enable <strong>an administrator to review</strong> the above, on a <strong>per user basis</strong> (you may extend this to provide other auditing views e.g., <strong>per record</strong>).</p>
 
-<hr>
-<h1>some basic demos</h1>
-<ul>
-    <li>
-        <a href="../php-demos/index.php">PHP demos</a>
-    </li>
-    <li>
-        <a href="../js-demos/index.html">Javascript demos</a>
-    </li>
-</ul>
 
 <?php include_once("inc/footer.php"); ?>
