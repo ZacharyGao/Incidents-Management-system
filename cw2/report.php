@@ -25,7 +25,7 @@ if (isset($_SESSION['username'])) {
         $person = clean_input($_POST['person']);
         $personID = findPersonIDByLicence($db, $person);
         if (empty($personID)) {
-            $infoForAddReport = "Please add this person first.<br>";
+            $infoForAddReport = "<p>Please add this person first.<br></p>";
             echo $infoForAddReport;
         } else {
 
@@ -33,7 +33,7 @@ if (isset($_SESSION['username'])) {
             $vehicleID = findVehicleIDByLicence($db, $regNum);
 
             if (empty($vehicleID)) {
-                $infoForAddReport =  "Please add this vehicle first. <a href='add_vehicle.php'>Add Vehicle</a><br>";
+                $infoForAddReport =  "<p>Please add this vehicle first. <a href='add_vehicle.php'>Add Vehicle</a><br></p>";
                 echo $infoForAddReport;
             } else {
                 $date = clean_input($_POST['date']);
@@ -42,21 +42,24 @@ if (isset($_SESSION['username'])) {
                 $offenceID = clean_input($_POST['offence']);
 
                 if (empty($date) || empty($time) || empty($statement) || empty($offenceID)) {
-                    $infoForAddReport = "Please fill in all fields.";
+                    $infoForAddReport = "<p>Please fill in all fields.</p>";
                 } else {
                     addIncident($db, $vehicleID, $personID, $date, $statement, $offenceID);
-                    $infoForAddReport = "Report successfully added.";
+                    addAuditLog($db, $_SESSION['username'], "CREATE", "Added new Incident: <strong>" . $statement . "</strong> with offence ID: " . $offenceID . "");
+                    $infoForAddReport = "<p>Report successfully added.</p>";
                 }
             }
         }
     } else {
-        $infoForAddReport = "Please fill in all fields.";
+        $infoForAddReport = "<p>Please fill in all fields.</p>";
     }
 
     // search report
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['report'])) {
         $report = clean_input($_POST['report']);
         $incident = queryIncident($db, $report);
+        
+        addAuditLog($db, $_SESSION['username'], "RETRIEVE", "Searched for Incident: <strong>" . $report . "</strong>");
     }
 } else {
     pleaseLogin();
@@ -89,7 +92,7 @@ if (isset($_SESSION['username'])) {
         <textarea type="textarea" class="form-control> <?php echo $infoForAddReport ? 'is-invalid' : null; ?>" id="statement" name="statement">
         </textarea>
 
-        <label for="offence">Offence Type</label>
+        <label for="offence">Offence Type <span style="color:red;">*</span></label>
         <select name="offence" id="offence" style="width:50%">
             <?php
             $offences = queryOffences($db, "");

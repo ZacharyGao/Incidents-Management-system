@@ -19,13 +19,14 @@ if (isset($_SESSION['username'])) {
                 $incidentID = clean_input($_POST['incidentID']);
     
                 if (empty($amount) || empty($points) || empty($incidentID)) {
-                    $infoForFines = "Please fill in all fields.";
+                    $infoForFines = "<p>Please fill in all fields.</p>";
                 } else {
                     addFine($db, $amount, $points, $incidentID);
-                    $infoForFines = "Fine successfully added.";
+                    addAuditLog($db, $_SESSION['username'], "CREATE", "Added new Fine: <strong>" . $amount . "</strong> with points: " . $points . " and incident ID: ".$incidentID."");
+                    $infoForFines = "<p>Fine successfully added</p>.";
                 }
             } else {
-                $infoForFines = "Please fill in all fields.";
+                $infoForFines = "<p>Please fill in all fields.</p>";
             }
             
 ?>

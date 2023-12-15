@@ -17,15 +17,14 @@ if (isset($_SESSION['username'])) {
             $infoError =  "<p>You searched for: " . $_POST["info"] . "</p>";
             // search vehicle
             $vehicle = queryVehicle($db, $_POST["info"]);
+            addAuditLog($db, $_SESSION['username'], "RETRIEVE", "searched for <strong>Vehicle</strong> with: '<strong>".$_POST["info"]."'</strong>");
         }
-    } 
-    // else {
-        // $vehicle = queryVehicle($db, "");
-        $vehicle = [];
-        if (isset($_POST["showAllVehicles"])) {
-            $vehicle = queryVehicle($db, "");
-        }
-    // $vehicle = queryVehicle($db, "");
+    }
+
+    if (isset($_POST["showAllVehicles"])) {
+        $vehicle = queryVehicle($db, "");
+        addAuditLog($db, $_SESSION['username'], "RETRIEVE", "showed all <strong>Vehicles</strong>");
+    }
 
 } else {
     pleaseLogin();
@@ -44,7 +43,6 @@ if (isset($_SESSION['username'])) {
     <button type="submit" class="btn btn-primary">Search</button>
     <button type="submit" class="btn btn-primary" name="showAllVehicles">Show all vehicles</button>
 </form>
-<!-- <button class="btn btn-primary" onclick="window.location.href='add_vehicle.php'">Add New Vehicle</button> -->
 
 
 
@@ -81,47 +79,6 @@ if (isset($_SESSION['username'])) {
 
 
 
-
-
-
-
-<!-- table to show vehicle info -->
-<!-- <div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Query Results:</h2>
-            <?php if (empty($vehicle)) : ?>
-                <p>No results found.</p>
-            <?php else : ?>
-                <p>Found <?php echo count($vehicle); ?> results.</p>
-                <table class="table table-striped" id="searchVehicleTable">
-                    <thead>
-                        <tr>
-                            <th>Vehicle_ID</th>
-                            <th>Vehicle_type</th>
-                            <th>Vehicle_colour</th>
-                            <th>Vehicle_licence</th>
-                            <th>Owner_name</th>
-                            <th>Owner_licence</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($vehicle as $vehicleInfo) { ?>
-                            <tr>
-                                <td><?php echo $vehicleInfo["Vehicle_ID"]; ?></td>
-                                <td><?php echo $vehicleInfo["Vehicle_type"]; ?></td>
-                                <td><?php echo $vehicleInfo["Vehicle_colour"]; ?></td>
-                                <td><?php echo $vehicleInfo["Vehicle_licence"]; ?></td>
-                                <td><?php echo $vehicleInfo["People_name"]; ?></td>
-                                <td><?php echo $vehicleInfo["People_licence"]; ?></td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
-        </div>
-    </div>
-</div> -->
 
 
 

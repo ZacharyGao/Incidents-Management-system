@@ -300,6 +300,27 @@ function queryIncident($db, $info)
     return $incident;
 }
 
+function queryAuditLog($db, $info)
+{
+    $stmt = $db->prepare("SELECT * FROM Log WHERE username LIKE ? or operation_time LIKE ? or operation_type LIKE ? or details LIKE ? ORDER BY operation_time DESC");
+
+    $info = "%$info%";
+    $stmt->bind_param("ssss", $info, $info, $info, $info);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $log = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    return $log;
+}
+
+function addAuditLog($db, $username, $operationType, $details)
+{
+    $stmt = $db->prepare("INSERT INTO Log (username, operation_type, details) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $username, $operationType, $details);
+    $stmt->execute();
+}
+
+
 function queryOffences($db, $info)
 {
     $stmt = $db->prepare("SELECT * FROM Offence WHERE Offence_ID LIKE ? OR Offence_description LIKE ?");

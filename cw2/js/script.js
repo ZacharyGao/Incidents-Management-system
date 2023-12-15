@@ -56,6 +56,19 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    
+    var currentPage = window.location.pathname.split("/").pop();
+    var navItems = document.querySelectorAll(".sidenav ul li[data-page]");
+
+    navItems.forEach(function(item) {
+        if(item.getAttribute('data-page') === currentPage.replace('.php', '')) {
+            item.classList.add('active');
+        }
+        else {
+            item.classList.remove('active');
+        }
+    });
+
 });
 
 function ajaxFormSubmit(formSelector, targetUrl) {
@@ -69,6 +82,16 @@ function ajaxFormSubmit(formSelector, targetUrl) {
         xhr.onload = function () {
             if (this.status == 200) {
                 document.querySelector(".container").innerHTML = this.responseText;
+
+                // add event listener to the search input field
+                var inputElement = document.getElementById("ownerAutocomplete");
+                var tableID = "searchPeople";
+                var columnNames = ["People_name", "People_license"];
+                if (inputElement && document.getElementById(tableID)) {
+                    inputElement.onkeyup = function() {
+                        filterTableByName("info", tableID, columnNames);
+                    };
+                }
             }
         };
 
@@ -553,9 +576,17 @@ function addNewPersonToDatabase() {
 }
 
 
-document.getElementById("query_people").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        document.querySelector("#query_people button[type='submit']").click();
-    }
-});
+if (document.getElementById("query_people")) {
+    document.getElementById("query_people").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.querySelector("#query_people button[type='submit']").click();
+        }
+    });
+}
+// document.getElementById("query_people").addEventListener("keydown", function(event) {
+//     if (event.key === "Enter") {
+//         event.preventDefault();
+//         document.querySelector("#query_people button[type='submit']").click();
+//     }
+// });

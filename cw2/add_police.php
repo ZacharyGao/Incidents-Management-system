@@ -16,6 +16,7 @@ if (isset($_SESSION['username'])) {
 
 
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_username'], $_POST['new_password'], $_POST['police_role'])) {
+
             $new_username = clean_input($_POST['new_username']);
             $new_password = clean_input($_POST['new_password']);
             $police_role = clean_input($_POST['police_role']);
@@ -31,7 +32,9 @@ if (isset($_SESSION['username'])) {
                 $insert_stmt = $db->prepare("INSERT INTO Police (Police_username, Police_password, Police_role) VALUES (?, ?, ?)");
                 $insert_stmt->bind_param("sss", $new_username, $new_password, $police_role);
                 $insert_stmt->execute();
-                $success = "User successfully added. Your username is: " . $new_username . "." . " Your password is: " . $new_password . ".";
+                $success = "User successfully added. New username is: " . $new_username . "." . " New password is: " . $new_password . ".";
+
+                addAuditLog($db, $_SESSION['username'], "CREATE", "Added new Police User: <strong>" . $new_username . "</strong> with role: <strong>" . $police_role . "</strong>");
             } else {
                 $error = "User already exists.";
             }

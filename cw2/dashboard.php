@@ -24,14 +24,9 @@ if (isset($_SESSION['username'])) {
     ?>
         <button class="btn btn-primary" onclick="window.location.href='Fine.php'" style="margin:1rem 0rem">Fine</button>
         <button class="btn btn-primary" onclick="window.location.href='add_police.php'">Add Police User</button>
-        <button class="btn btn-primary" onclick="window.location.href='search_audit.php'"style="margin:1rem 0rem">Audit</button>
+        <button class="btn btn-primary" onclick="window.location.href='audit_log.php'"style="margin:1rem 0rem">Audit</button>
     <?php } else {
     } ?>
-
-    <br>
-    <button class="btn btn-primary" onclick="window.location.href='add_people.php'">Add New People</button>
-    <button class="btn btn-primary" onclick="window.location.href='search_audit.php'">Audit</button>
-    <button class="btn btn-primary" onclick="window.location.href='add_police.php'">Add Police User</button>
 
     <ul>
         <li><a href="index.php">Home</a></li>
@@ -45,7 +40,7 @@ if (isset($_SESSION['username'])) {
         if (isset($_SESSION['role']) && $_SESSION['role'] == 'Administrator') {
         ?>
             <li><a href="fine.php">Fine</a></li>
-            <li><a href="search_audit.php">Audit</a></li>
+            <li><a href="audit_log.php">Audit</a></li>
             <li><a href="add_police.php">Add Police User</a></li>
         <?php } else {
         } ?>

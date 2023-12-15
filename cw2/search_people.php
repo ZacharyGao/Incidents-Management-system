@@ -15,13 +15,14 @@ if (isset($_SESSION['username'])) {
             // $infoError =  "<p>You searched for: " . $_POST["info"] . "</p>";
             // search people
             $people = queryPeople($db, $_POST["info"]);
+            addAuditLog($db, $_SESSION['username'], "RETRIEVE", "searched for <strong>People</strong> with: '<strong>".$_POST["info"]."'</strong>");
         }
     }
-    $people = [];
 
     if (isset($_POST["showAllFlag"]) && $_POST["showAllFlag"] == '1') {
         $people = queryPeople($db, "");
         $_POST["showAllFlag"] = '0';
+        addAuditLog($db, $_SESSION['username'], "RETRIEVE", "showed all <strong>People</strong>");
     }
     
 

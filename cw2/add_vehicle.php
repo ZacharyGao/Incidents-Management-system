@@ -61,6 +61,7 @@ if (isset($_SESSION['username'])) {
                     // echo $infoError;
                     // add vehicle
                     addVehicle($db, $_POST["type"], $_POST["colour"], $_POST["regNum"], $_POST["owner"]);
+                    addAuditLog($db, $_SESSION['username'], "CREATE", "added new <strong>Vehicle</strong> with plate number: '<strong>".$_POST["regNum"]."'</strong>");
                 }
             }
         }
@@ -86,11 +87,11 @@ if (isset($_SESSION['username'])) {
         <div class="feedback-container" id="addNewPersonInfo" name="addNewPersonInfo"><?php echo $addNewPersonInfo; ?></div>
 
         <br>
-        <label for="type">Vehicle type </label>
+        <label for="type">Vehicle type <span style="color:red;">*</span></label>
         <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="type" name="type">
-        <label for="colour">Vehicle colour </label>
+        <label for="colour">Vehicle colour <span style="color:red;">*</span></label>
         <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="colour" name="colour">
-        <label for="regNum">Vehicle licence </label>
+        <label for="regNum">Vehicle licence <span style="color:red;">*</span></label>
         <input type="text" class="form-control <?php echo $infoError ? 'is-invalid' : null; ?>" id="regNum" name="regNum">
 
         <button type="submit" class="btn btn-primary">Add</button>

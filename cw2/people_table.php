@@ -6,6 +6,7 @@ $info = filter_input(INPUT_POST, "info", FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
 if (!empty($info)) {
     $people = queryPeople($db, $info);
+    addAuditLog($db, $_SESSION['username'], "RETRIEVE", "searched for <strong>People</strong> with: '<strong>" . $info . "'</strong>");
     // generate table
 
     if (!empty($people)) {
@@ -13,7 +14,7 @@ if (!empty($info)) {
 
         // generate table header
         echo "
-        <table class='table table-striped' id='peopleTable'>
+        <table class='table table-striped' id='peopleTable' name='peopleTable'>
         <thead>
         <tr>
             <th>People_ID</th>

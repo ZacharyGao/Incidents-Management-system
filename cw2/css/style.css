@@ -282,8 +282,6 @@ nav ul li ul li a {
 .sidenav {
     height: 100%;
     width: 15%;
-    /* max-width: fit-content; */
-    /* max-width: 15%; */
     position: fixed;
     /* z-index: 1; */
     top: 0;
@@ -309,14 +307,10 @@ nav ul li ul li a {
 }
 
 .sidenav ul li {
-    /* display: flex; */
     display: block;
     margin: 0 0.5rem;
-    /* padding: 0rem 0.5rem; */
-    /* background-color: #118bee; */
     position: relative;
     text-align: left;
-    /* width: auto; */
 }
 
 .sidenav ul li a {
@@ -325,8 +319,6 @@ nav ul li ul li a {
     font-size: 20px;
     /* color: #818181; */
     color: #F3F4F5;
-    /* display: flex; */
-    /* display: block; */
     width: 90%;
     transition: 0.3s;
     display: block;
@@ -404,6 +396,17 @@ nav ul li ul li a {
 .sidenav ul li a.active {
     background-color: #D7336C;
     color: white;
+}
+
+.sidenav ul li.active {
+    
+    background-color: #D7336C;
+    color: white;
+
+    display: block;
+    margin: 0 0.5rem;
+    position: relative;
+    text-align: left;
 }
 
 

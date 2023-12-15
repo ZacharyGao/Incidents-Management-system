@@ -23,6 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // add person to database
     addPerson($db, $personName, $licenceNum, $address, $personDOB, $penaltyPoints,);
+    addAuditLog($db, $_SESSION['username'], "CREATE", "Added new Person: <strong>" . $personName."</strong> with licence number: ".$licenceNum."");
 
     // response success message
     echo "New person <strong>".$personName."</strong> added successfully.<br>";
