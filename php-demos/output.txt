@@ -1,2 +1,0 @@
-A message from PHP
-Another line of text

@@ -23,30 +23,34 @@ if (isset($_SESSION['username'])) {
     ) {
 
         $person = clean_input($_POST['person']);
-        $personID = findPersonIDByLicence($db, $person);
-        if (empty($personID)) {
-            $infoForAddReport = "<p>Please add this person first.<br></p>";
-            echo $infoForAddReport;
+        if (empty($person)) {
+            $infoForAddReport = "<p>Please fill in all fields.</p>";
         } else {
-
-            $regNum = clean_input($_POST['regNum']);
-            $vehicleID = findVehicleIDByLicence($db, $regNum);
-
-            if (empty($vehicleID)) {
-                $infoForAddReport =  "<p>Please add this vehicle first. <a href='add_vehicle.php'>Add Vehicle</a><br></p>";
+            $personID = findPersonIDByLicence($db, $person);
+            if (empty($personID)) {
+                $infoForAddReport = "<p>Please add this person first.<br></p>";
                 echo $infoForAddReport;
             } else {
-                $date = clean_input($_POST['date']);
-                $time = clean_input($_POST['time']);
-                $statement = clean_input($_POST['statement']);
-                $offenceID = clean_input($_POST['offence']);
 
-                if (empty($date) || empty($time) || empty($statement) || empty($offenceID)) {
-                    $infoForAddReport = "<p>Please fill in all fields.</p>";
+                $regNum = clean_input($_POST['regNum']);
+                $vehicleID = findVehicleIDByLicence($db, $regNum);
+
+                if (empty($vehicleID)) {
+                    $infoForAddReport =  "<p>Please add this vehicle first. <a href='add_vehicle.php'>Add Vehicle</a><br></p>";
+                    echo $infoForAddReport;
                 } else {
-                    addIncident($db, $vehicleID, $personID, $date, $statement, $offenceID);
-                    addAuditLog($db, $_SESSION['username'], "CREATE", "Added new Incident: <strong>" . $statement . "</strong> with offence ID: " . $offenceID . "");
-                    $infoForAddReport = "<p>Report successfully added.</p>";
+                    $date = clean_input($_POST['date']);
+                    $time = clean_input($_POST['time']);
+                    $statement = clean_input($_POST['statement']);
+                    $offenceID = clean_input($_POST['offence']);
+
+                    if (empty($date) || empty($time) || empty($statement) || empty($offenceID)) {
+                        $infoForAddReport = "<p>Please fill in all fields.</p>";
+                    } else {
+                        addIncident($db, $vehicleID, $personID, $date, $statement, $offenceID);
+                        addAuditLog($db, $_SESSION['username'], "CREATE", "Added new Incident: <strong>" . $statement . "</strong> with offence ID: " . $offenceID . "");
+                        $infoForAddReport = "<p>Report successfully added.</p>";
+                    }
                 }
             }
         }
@@ -58,7 +62,7 @@ if (isset($_SESSION['username'])) {
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['report'])) {
         $report = clean_input($_POST['report']);
         $incident = queryIncident($db, $report);
-        
+
         addAuditLog($db, $_SESSION['username'], "RETRIEVE", "Searched for Incident: <strong>" . $report . "</strong>");
     }
 } else {
@@ -79,17 +83,17 @@ if (isset($_SESSION['username'])) {
         </div>
 
         <label for="date">Date <span style="color:red;">*</span></label>
-        <input type="date" class="form-control <?php echo $infoForAddReport ? 'is-invalid' : null; ?>" id="date" name="date">
+        <input type="date" class="form-control" id="date" name="date">
 
         <label for="time">Time <span style="color:red;">*</span></label>
-        <input type="time" class="form-control <?php echo $infoForAddReport ? 'is-invalid' : null; ?>" id="time" name="time">
+        <input type="time" class="form-control" id="time" name="time">
 
         <label for="regNum">Vehicle Plate Number <span style="color:red;">*</span></label>
-        <input type="text" class="form-control <?php echo $infoForAddReport ? 'is-invalid' : null; ?>" id="regNum" name="regNum">
+        <input type="text" class="form-control" id="regNum" name="regNum">
 
         <br>
         <label for="statement">statement <span style="color: red;">*</span></label>
-        <textarea type="textarea" class="form-control> <?php echo $infoForAddReport ? 'is-invalid' : null; ?>" id="statement" name="statement">
+        <textarea type="textarea" class="form-control>" id="statement" name="statement">
         </textarea>
 
         <label for="offence">Offence Type <span style="color:red;">*</span></label>

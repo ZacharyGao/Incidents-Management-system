@@ -202,7 +202,7 @@ function findPersonIDByLicence($db, $licence)
     } elseif (count($people) == 1) {
         return $people[0]['People_ID'];
     } else {
-        echo "More than one people found. Please check.<br>";
+        // echo "More than one people found. Please check.<br>";
         return null;
     }
 
@@ -366,8 +366,6 @@ function addVehicle($db, $vehicleType, $vehicleColour, $vehicleLicence, $peopleL
             // echo "Person not found. Please add this person: " . $peopleLicence . " first.<br>";
             return false;
         } elseif (count($searchedPeople) > 1) {
-            // echo "More than one people found. Please check.<br>";
-            // printTable($searchedPeople);
             return false;
         }
         // exactly one people found, then add vehicle
