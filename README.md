@@ -7,6 +7,8 @@
 **Overview:** 
 This technical manual provides the necessary information for setting up and managing the Incidents Management System (IMS) using Docker, which encapsulates the components of the LAMP stack.
 
+**User Manual:** [UserManualforIMS](https://github.com/ZacharyGao/Incidents-Management-system/blob/main/User%20Manual%20for%20Incidents%20Management%20System%20(IMS).pdf)
+
 **URL for Start Page:** 
 `http://localhost/cw2/index.php`
 
